@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Update Grade</title>
+      <style>
+         body {
+         font-family: Arial, sans-serif;
+         background-color: #f4f4f4;
+         margin: 0;
+         padding: 0;
+         }
+         h1 {
+         margin-top: 50px;
+         text-align: center;
+         color: #333;
+         }
+         table {
+         margin: auto;
+         margin-top: 50px;
+         border-collapse: collapse;
+         background-color: #fff;
+         box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+         }
+         th, td {
+         padding: 10px;
+         text-align: left;
+         border-bottom: 1px solid #ddd;
+         }
+         th {
+         background-color: #f2f2f2;
+         font-weight: bold;
+         color: #333;
+         }
+         td input[type="checkbox"] {
+         margin: auto;
+         display: block;
+         }
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;}
+         .notification-container {
+         position: fixed;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         }
+         .alert-success {
+         padding: 1rem;
+         background-color: #d4edda;
+         border: 1px solid #c3e6cb;
+         color: #155724;
+         border-radius: 5px;
+         font-size: 1.2rem;
+         }
+      </style>
+   </head>
+   <body>
+      <a class="back-button" href="{{ url_for('lecturer_home') }}">Home</a>
+      <h1>Update Grade</h1>
+      <div style="display: block; float: left; width: 50%;">
+         <div class="table-container">
+            <table>
+               <caption>Class</caption>
+               <thead>
+                  <tr>
+                     <th>Day</th>
+                     <th>Time</th>
+                     <th>Classroom ID</th>
+                     <th>Course ID</th>
+                     <th>Course Name</th>
+                     <th>Semester</th>
+                     <th>Select</th>
+                     <th>Attendance</th>
+                     <th>Attendance report</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for class in list_class %}
+                  <tr>
+                     <td>{{ class['Day'] }}</td>
+                     <td>{{ class['Time'] }}</td>
+                     <td>{{ class['classroom ID'] }}</td>
+                     <td>{{ class['Course ID']}}</td>
+                     <td>{{ class['Course Name']}}</td>
+                     <td>{{ class['Semester']}}</td>
+                     <td>
+                        <form action="{{ url_for('choose_student') }}" method="post">
+                           <input type="hidden" name="day" value="{{ class['Day'] }}">
+                           <input type="hidden" name="time" value="{{ class['Time'] }}">
+                           <input type="hidden" name="classroomid" value="{{ class['classroom ID'] }}">
+                           <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
+                           <input type="hidden" name="semester" value="{{class['Semester']}}">
+                           <input type="hidden" name="scheduleid" value="{{class['ScheduleID']}}">
+                           <button type="submit">Select</button>
+                        </form>
+                     </td>
+                     <td>
+                        <form id="attendance-form" action="/update_attendance" method="POST">
+                        <input type="hidden" name="scheduleid" value="{{ class['Schedule ID']}}">
+                        <input type="hidden" name="status" value="{{ class['status'] }}">
+                        {% if class['status']=='close'%}
+                        <button id="submitButton" type="submit">Open</button>
+                        {% else %}
+                        <button id="submitButton" type="submit">Close</button>
+                        {%endif%}
+                        </form>
+                     </td>
+                     <td>
+                        {% for l in l_att_st %}
+                           {% if l['Schedule ID'] == class['Schedule ID'] %}
+                              <form id="download-form" method="post" action="/down_report_att">
+                                    <input type="hidden" name="scheduleid" value="{{class['Schedule ID']}}">
+                              </form>
+                              <button onclick="confirmDownload()">Download report</button>
+                           {% endif %}
+                        {% endfor %}
+
+                        <script>
+                           function confirmDownload() {
+                              if (confirm("Are you sure you want to download the report?")) {
+                                    document.getElementById("download-form").submit();
+                              }
+                           }
+                        </script>
+                     </td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+      </div>
+      <div style="display: block; float: right; width: 50%;">
+         {% for semester, classes in list_class_previous|groupby(attribute='Semester') %}
+         <h2>{{ semester }}</h2>
+         <table>
+            <div style="display: block;  right:20px">
+               <thead>
+                  <tr>
+                     <th>Course ID</th>
+                     <th>Course Name</th>
+                     <th>Excel</th>
+                     <th>Report pdf</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for class in classes %}
+                  <tr>
+                     <td>{{ class['Course ID'] }}</td>
+                     <td>{{ class['Course Name'] }}</td>
+                     <td>
+                        <form action="{{ url_for('down_report_grade') }}" method="post">
+                           <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
+                           <input type="hidden" name="semester" value="{{ class['Semester'] }}">
+                           <button type="submit" name="download_button">Excel</button>
+                        </form>
+                     </td>
+                     <td>
+                        <form action="{{ url_for('down_report_grade_pdf') }}" method="post">
+                           <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
+                           <input type="hidden" name="semester" value="{{ class['Semester'] }}">
+                           <button type="submit" name="download_button">Report pdf</button>
+                        </form>
+                     </td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+         </table>
+         </div>
+         {% endfor %}
+      </div>
+      <div style="display: block;">
+         {% if list_student %}
+         <form method="POST" action="/input_grade">
+            <table>
+               <caption>Student list</caption>
+               <div class="notification-container">
+                  {% if message %}
+                  <div class="alert-success">{{ message }}</div>
+                  {% endif %}
+               </div>
+               <thead>
+                  <tr>
+                     <th>Student ID</th>
+                     <th>Name</th>
+                     <th>Process</th>
+                     <th>Mid</th>
+                     <th>Final</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for student in list_student %}
+                  <tr>
+                     <td>{{ student['Student ID'] }}</td>
+                     <td>{{ student['Name'] }}</td>
+                     <td><input type="number" name="process_{{ student['Student ID'] }}" value="{{student['process']}}" step="0.1"></td>
+                     <td><input type="number" name="mid_{{ student['Student ID'] }}" value="{{student['mid']}}" step="0.1"></td>
+                     <td><input type="number" name="final_{{ student['Student ID'] }}" value="{{student['final']}}" step="0.1"></td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+            <button type="submit" class="my-btn">Submit</button>
+            <style>
+               .my-btn {
+               background-color: #4CAF50; /* Green */
+               border: none;
+               color: white;
+               padding: 10px 20px;
+               text-align: center;
+               text-decoration: none;
+               display: block;
+               font-size: 16px;
+               margin: auto;
+               cursor: pointer;
+               border-radius: 5px;
+               transition-duration: 0.4s;
+               }
+               .my-btn:hover {
+               background-color: #3e8e41;
+               }
+            </style>
+         </form>
+         {% endif %}
+      </div>
+   </body>
+</html>

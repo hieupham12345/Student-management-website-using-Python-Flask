@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <style>
+         body {
+         font-family: Arial, sans-serif;
+         background-color: #f1f1f1;
+         }
+         h1 {
+         text-align: center;
+         color: #333;
+         margin-top: 50px;
+         }
+         nav ul {
+         display:flex;
+         flex-direction: column;
+         justify-content: flex-start;
+         align-items: flex-start;
+         list-style-type: none;
+         margin-left: 0px;
+         }
+         nav li {
+         margin: 20px;
+         }
+         nav a {
+         color: #000000;
+         text-decoration: none;
+         font-size: 18px;
+         text-transform: uppercase;
+         padding: 5px 10px;
+         border-radius: 5px;
+         background-color: #fff;
+         transition: all 0.2s ease;
+         }
+         nav a:hover {
+         background-color: #333;
+         color: #fff;
+         }
+         body{
+         background-color: rgb(167, 230, 228);}
+      </style>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Trang chủ - Quản lý sinh viên</title>
+   </head>
+   <body>
+      <h1>Hello</h1>
+      <nav>
+         <ul>
+            <li><a href="{{ url_for('ad_user_profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('schedule_manage') }}">Schedule manage</a></li>
+            <li><a href="{{ url_for('test_schedule_manage') }}">Test schedule manage</a></li>
+            <li><a href="{{ url_for('student_manage') }}">Student manage</a></li>
+            <li><a href="{{url_for('grade_manage')}}">Grade manage</a></li>
+            <li><a href="{{ url_for('change_password') }}">Change password</a></li>
+            <li><a href="{{ url_for('logout') }}">logout</a></li>
+         </ul>
+      </nav>
+   </body>
+</html>

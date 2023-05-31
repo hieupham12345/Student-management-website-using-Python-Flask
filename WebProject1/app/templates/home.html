@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <style>
+         body {
+         font-family: Arial, sans-serif;
+         background-color: #f1f1f1;
+         }
+         h1 {
+         text-align: center;
+         color: #333;
+         margin-top: 50px;
+         }
+         nav ul {
+         display:flex;
+         flex-direction: column;
+         justify-content: flex-start;
+         align-items: flex-start;
+         list-style-type: none;
+         margin-left: 0px;
+         }
+         nav li {
+         margin: 20px;
+         }
+         nav a {
+         color: #000000;
+         text-decoration: none;
+         font-size: 18px;
+         text-transform: uppercase;
+         padding: 5px 10px;
+         border-radius: 5px;
+         background-color: #fff;
+         transition: all 0.2s ease;
+         }
+         nav a:hover {
+         background-color: #333;
+         color: #fff;
+         }
+         body{
+         background-color: rgb(167, 230, 228);}
+      </style>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Trang chủ - Quản lý sinh viên</title>
+   </head>
+   <body>
+      <h1>Hello student</h1>
+      <nav>
+      <ul>
+      <ul class="nav-menu">
+         <li><a href="{{ url_for('profile') }}">Profile</a></li>
+         <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+         <li><a href="{{ url_for('testschedule') }}">Test Schedule</a></li>
+         <li><a href="{{ url_for('courseregister') }}">Course Registration</a></li>
+         <li><a href="{{ url_for('grades') }}">Grade</a></li>
+         <li><a href="{{ url_for('tuitionfee') }}">Tuition Fee</a></li>
+         <li><a href="{{ url_for('change_password') }}">Change password</a></li>
+         <li><a href="{{ url_for('logout') }}">logout</a></li>
+      </ul>
+      </div>
+   </body>
+</html>

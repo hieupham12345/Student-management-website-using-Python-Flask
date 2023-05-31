@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Test List</title>
+      <style>
+         table {
+         border-collapse: collapse;
+         width: 50%;
+         }
+         th, td {
+         text-align: left;
+         padding: 8px;
+         border-bottom: 1px solid #ddd;
+         }
+         th {
+         background-color: #f2f2f2;
+         }
+         .left {
+         float: left;
+         width: 50%;
+         }
+         .right {
+         float: right;
+         width: 50%;
+         }
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         }
+         .add-test-btn{
+         background-color: #4CAF50;
+         color: white;
+         padding: 5px 10px;
+         border: none;
+         border-radius: 4px;
+         cursor: pointer;
+         font-size: 16px;
+         }
+         .alert {
+         padding: 15px;
+         margin-bottom: 20px;
+         border: 1px solid transparent;
+         border-radius: 4px;
+         font-size: 16px;
+         position: fixed;
+         top:50px;
+         left: 50px;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="top" style="height: 200px; background-color: aquamarine;">
+         <a class="back-button" href="{{ url_for('ad_user_home') }}">Home</a>
+         <button class="add-test-btn" onclick="showTestForm()">Add Test</button>
+         {% if Message %}
+         <div class="alert">{{ Message}}</div>
+         {% endif %}
+         <div id="test-form" style="display: none; position: fixed; top: 160px; left: 20px; text-rendering: auto;">
+            <form method="post" action="{{ url_for('add_test_schedule')}}">
+               <label for="test-select">Choose a test:</label>
+               <select id="test-select" name="test">
+                  {% for r in test_list_schedule %}
+                  <option value="{{r['Schedule ID'] }},{{ r['Course ID'] }}">
+                     {{r['Course ID'] }} - {{ r['Day'] }} - {{ r['Time'] }}
+                  </option>
+                  {% endfor %}
+               </select>
+               <label for="room-select">Room:</label>
+               <select id="room-select" name="room">
+                  {% for room in l_room %}
+                  <option value="{{ room }}">
+                     {{ room }}
+                  </option>
+                  {% endfor %}
+               </select>
+
+               <label for="lecturer">Lecturer:</label>
+               <select name="lecturer" id="lecturer">
+                  {% for lt in l_lt %}
+                  <option value="{{lt['Lecturer ID']}}">{{lt['Lecturer ID']}} - {{lt['Name']}}</option>
+                  {%endfor%}
+               </select>
+               <label for="date-input" name="date">Date:</label>
+               <input type="date" id="date-input" name="date">
+               <label for="time-input" name="time">Time:</label>
+               <input type="time" id="time-input" name="time">
+               <button type="submit">Confirm</button>
+            </form>
+         </div>
+         <script>
+            function showTestForm() {
+            document.getElementById("test-form").style.display = "block";
+            }
+         </script>
+      </div>
+      <div class="left">
+         <table>
+            <thead>
+               <tr>
+                  <th>Schedule ID</th>
+                  <th>Course name</th>
+                  <th>Course ID</th>
+                  <th>Time</th>
+                  <th>Classroom ID</th>
+                  <th>Select</th>
+                  <th>Select</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for r in test_list %}
+               <tr>
+                  <td>{{r['Schedule ID']}}</td>
+                  <td>{{ r['Course name'] }}</td>
+                  <td>{{ r['Course ID'] }}</td>
+                  <td>{{ r['Time'] }}</td>
+                  <td>{{ r['Classroom ID'] }}</td>
+                  <td>
+                     <form action="{{ url_for('list_student_test') }}" method="post">
+                        <input type="hidden" name="scheduleid" value="{{ r['Schedule ID'] }}">
+                        <button type="submit"> More</button>
+                     </form>
+                  </td>
+                  <td>
+                     <form action="{{ url_for('delete_test_schedule') }}" method="post">
+                        <input type="hidden" name="scheduleid" value="{{ r['Schedule ID'] }}">
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete this test schedule?');">Delete</button>
+                     </form>
+                  </td>
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+      <div class="right">
+         <div>
+         </div>
+         <div>
+            <table>
+               <tr>
+                  <th>Student ID</th>
+                  <th>Student Name</th>
+               </tr>
+               {% for st in st_list %}
+               <tr>
+                  <td>{{st['Student ID']}}</td>
+                  <td>{{st['Name']}}</td>
+               </tr>
+               {% endfor %}
+            </table>
+         </div>
+      </div>
+   </body>
+</html>

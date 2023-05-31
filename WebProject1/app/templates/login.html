@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Login Page</title>
+      <style>
+         body {
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+         }
+         
+         form {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+         }
+         
+         h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4066be;
+            text-align: center;
+            margin-bottom: 30px;
+         }
+         
+         label {
+            font-size: 18px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+            color: #333333;
+         }
+         
+         input[type="text"],
+         input[type="password"] {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            font-size: 16px;
+         }
+         
+         input[type="submit"] {
+            display: block;
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #51ae4e;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+         }
+         
+         input[type="submit"]:hover {
+            background-color: #45a049;
+         }
+         
+         .forgot_password {
+            text-align: center;
+            margin-bottom: 20px;
+         }
+         
+         .forgot_password a {
+            color: #000000;
+            text-decoration: underline;
+         }
+         
+         .error {
+            color: #ff0000;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+         }
+         
+         .message {
+            background-color: #f2dede;
+            color: #a94442;
+            padding: 10px;
+            border: 1px solid #ebccd1;
+            margin-bottom: 10px;
+            text-align: center;
+         }
+      </style>
+   </head>
+   <body>
+      <form action="/login" method="post">
+         <h1>Login</h1>
+         {% if message_change_pass %}
+         <div class="message">{{ message_change_pass }}</div>
+         {% endif %} {% if max_message %}
+         <div class="message">{{max_message}}</div>
+         {% endif %}
+         <label for="username">Username:</label>
+         <input type="text" id="username" name="username">
+         <label for="password">Password:</label>
+         <input type="password" id="password" name="password">
+         <input type="submit" value="Login">
+         <div class="forgot_password">
+            <a href="/forgot_password">Forgot password</a>
+         </div>
+         {% if error %}
+         <div class="error">{{ error }}</div>
+         {% if unlock_time %}
+         <p>You can try again in {{ remaining_time }} seconds.</p>
+         {% endif %} {% endif %} 
+      </form>
+   </body>
+</html>

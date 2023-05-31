@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Backup Database</title>
+	<style>
+		form {
+            display: block;
+            float: left;
+			width: 20%;
+		}
+		label {
+			display: block;
+			margin-bottom: 10px;
+		}
+		input[type="text"], input[type="password"] {
+			padding: 5px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			width: 100%;
+			margin-bottom: 20px;
+		}
+		input[type="submit"] {
+			background-color: #4CAF50;
+			color: white;
+			padding: 10px 20px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		input[type="submit"]:hover {
+			background-color: #3e8e41;
+		}
+	</style>
+</head>
+<body>
+	<h2>Backup Database</h2>
+        <form action="/backup_login" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+            <input type="submit" value="Backup">
+        </form>
+    {% if Message %}
+    <div>{{Message}}</div>
+    {%endif%}
+</body>
+</html>

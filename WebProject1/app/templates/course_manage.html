@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Search Course</title>
+      <style>
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;}
+         table {
+         border-collapse: collapse;
+         width: 100%;
+         }
+         th, td {
+         text-align: left;
+         padding: 8px;
+         }
+         tr:nth-child(even) {
+         background-color: #f2f2f2;
+         }
+         th {
+         background-color: #4CAF50;
+         color: white;
+         }
+         .alert {
+         border: 1px solid transparent;
+         border-radius: 4px;
+         font-size: 16px;
+         position: fixed;
+         }
+      </style>
+   </head>
+   <body>
+      <div style="height: 200px; background-color: aquamarine;">
+         <div style="float:left;width: 90%;">
+            <h1>Search Course</h1>
+            <form action="/search_course" method="POST">
+               <label for="course_id">Course ID:</label>
+               <input type="text" id="course_id" name="course_id">
+
+               <label for="course_name">Course Name:</label>
+               <input type="text" id="course_name" name="course_name">
+                
+                <label for="faculty_id">Faculty</label>
+                <select name="faculty_id" id="faculty_id">
+                {% for r in l_faculty %}
+                  <option value="{{r}}" >{{r}}</option>
+                  {%endfor%}
+               </select>
+               <input type="submit" value="Search">
+            </form>
+         </div>
+         <div style="float: right;width: 10%;">
+            <a class="back-button" href="{{ url_for('admin_home') }}" >Home</a>
+         </div>
+         {%if Message%}
+         <div class="alert">{{ Message}}</div>
+         {%endif%}
+      </div>
+      <div>
+        <button id="add-button" onclick="showaddcourse_form()">Add course</button>
+        <button id="delete-course" onclick="showDLform()">Delete course</button>
+            <form id="add_course" method="POST" style="display: none;" action="/add_course">
+               <label for="course_id">Course ID:</label>
+               <input type="text" id="course_id" name="course_id">
+
+               <label for="course_name">Course Name:</label>
+               <input type="text" id="course_name" name="course_name">
+                
+                <label for="faculty_id">Faculty</label>
+                <select name="faculty_id" id="faculty_id">
+                {% for r in l_faculty %}
+                  <option value="{{r}}" >{{r}}</option>
+                  {%endfor%}
+               </select>
+
+                <label for="credit">Credit</label>
+                <input type="number" name="credit" id="credit">
+
+                <label for="description">Description</label>
+                <input type="text" name="description" id="description">
+
+                <label for="previous_course">Previous Course</label>
+                <select name="previous_course" id="previous_course">
+                <option value="">None</option>
+                {% for c in l_course_full %}
+                <option value="{{c['courseID']}}">{{c['courseID']}}</option>
+                {% endfor %}
+                </select>
+
+                <label for="following_course">Following Course</label>
+                <select name="following_course" id="following_course">
+                <option value="">None</option>
+                {% for c in l_course_full %}
+                <option value="{{c['courseID']}}">{{c['courseID']}}</option>
+                {% endfor %}
+                </select>
+
+               <input type="submit" value="submit">
+            </form>
+        <script>
+        function showaddcourse_form(){
+         document.getElementById('add_course').style.display='block';
+         document.getElementById('delete-form').style.display='none';
+        }
+        </script>
+
+        <form action="/delete_course" id="delete-form" style="display: none;" method="post">
+            <label for="courseid">Course ID</label>
+            <select name="courseid" id="courseid">
+            {% for c in l_course_full %} 
+                <option value="{{c['courseID']}}">{{c['courseID']}}</option>
+            {%endfor%}
+            </select>
+
+            <input type="submit" value="submit" onclick="return confirmSubmit();">
+        </form>
+        <script>
+        function showDLform(){
+        document.getElementById('delete-form').style.display='block';
+        document.getElementById('add_course').style.display='none';
+
+        } 
+        function confirmSubmit() {
+        var result = confirm("Confirm delete?");
+        if (result == true) {
+            document.getElementById("myForm").submit();
+        } else {
+            return false;
+        }
+        }
+        </script>
+      </div>
+      <div style="  height: 500px; overflow-y: scroll; padding-right: 20px; ">
+         <h1>List of Course</h1>
+         <table>
+            <tr>
+               <th>Course ID</th>
+               <th>Course Name</th>
+               <th>Faculty ID</th>
+               <th>Credit</th>
+               <th>Description</th>
+               <th>Previous Course</th>
+               <th>Following Course</th>
+
+            </tr>
+            {% for c in l_course %}
+            <tr>
+               <td>{{ c['courseID'] }}</td>
+               <td>{{ c['courseName'] }}</td>
+               <td>{{ c['facultyID'] }}</td>
+               <td>{{ c['credit'] }}</td>
+               <td>{{ c['description'] }}</td>
+               <td>{{ c['previousCourse'] }}</td>
+               <td>{{ c['followingCourse'] }}</td>
+            </tr>
+            {% endfor %}
+         </table>
+      </div>
+   </body>
+</html>

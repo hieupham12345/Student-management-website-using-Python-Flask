@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Student Schedule</title>
+      <style>
+         table {
+         border-collapse: collapse;
+         width: 50%;
+         margin: 20px 0;
+         font-family: Arial, sans-serif;
+         color: #333;
+         background-color: #fff;
+         border: 2px solid #ccc;
+         }
+         th, td {
+         padding: 12px;
+         text-align: left;
+         border-bottom: 1px solid #ddd;
+         }
+         th {
+         background-color: #f2f2f2;
+         font-weight: bold;
+         text-transform: uppercase;
+         }
+         tr:nth-child(even) {
+         background-color: #f2f2f2;
+         }
+         tr:hover {
+         background-color: #ddd;
+         }
+         td:first-child {
+         border-left: none;
+         }
+         td:last-child {
+         border-right: none;
+         }
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         }
+      </style>
+   </head>
+   <body>
+      <a class="back-button" href="{{ url_for('dashboard') }}">Home</a>
+      <div>
+        <h1>Student Schedule</h1>
+         <table>
+            <thead>
+               <tr>
+                  <th>Course Name</th>
+                  <th>Day</th>
+                  <th>Time</th>
+                  <th>Classroom</th>
+                  <th>Lecturer Name</th>
+                  <th>Attendance</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for s in schedule %}
+               <tr>
+                  <td>{{ s['Course Name'] }}</td>
+                  <td>{{ s['Day'] }}</td>
+                  <td>{{ s['Time'] }}</td>
+                  <td>{{ s['Classroom ID'] }}</td>
+                  <td>{{ s['Lecturer Name'] }}</td>
+                  {% if s['status']=='open' %}
+                  <td>
+                     <form action="{{url_for('st_attendance') }}" id="st-form" style="display: none;" method="post">
+                     <div class="form-group">
+                        <label for="studentid">Student ID</label>
+                        <input type="text" name="studentid" id="studentid" value="{{session['username']}}">
+                     </div>
+                     <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="text" name="time" id="time" value="">
+                        <script>
+                        var now = new Date();
+                        var year = now.getFullYear();
+                        var month = now.getMonth() + 1;
+                        var day = now.getDate();
+                        var hours = now.getHours();
+                        var minutes = now.getMinutes();
+                        var seconds = now.getSeconds();
+                        var timeString = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+                        document.getElementById("time").value = timeString;
+                        </script>
+                     </div>
+                     <div class="form-group">
+                        <label for="note">Note</label>
+                        <input type="text" name="note" id="note">
+                     </div>
+                     <button type="submit">Submit</button>
+                     <input type="hidden" name="scheduleid" id="scheduleid" value="{{s['Schedule ID']}}">
+                     </form>
+                     <button id="clickat" onclick="showATform()">Attendance</button>
+                  </td>
+                  {% endif %}
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+      <div style="float: right; width: 50%;">
+         <script>
+         function showATform() {
+            var form = document.getElementById("st-form");
+            form.style.display = "block";
+            document.getElementById("clickat").style.display="none";
+         }
+         </script>
+      </div>
+   {% if Message %}
+   <div class="Message">{{Message}}</div>
+   {% endif %}
+   </body>
+</html>

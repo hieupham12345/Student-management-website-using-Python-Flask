@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Course Grades</title>
+      <style>
+         table {
+         border-collapse: collapse;
+         width: 50%;
+         margin: 20px 0;
+         font-family: Arial, sans-serif;
+         color: #333;
+         background-color: #fff;
+         border: 2px solid #ccc;
+         }
+         th, td {
+         padding: 12px;
+         text-align: left;
+         border-bottom: 1px solid #ddd;
+         }
+         th {
+         background-color: #f2f2f2;
+         font-weight: bold;
+         text-transform: uppercase;
+         }
+         tr:nth-child(even) {
+         background-color: #f2f2f2;
+         }
+         tr:hover {
+         background-color: #ddd;
+         }
+         td:first-child {
+         border-left: none;
+         }
+         td:last-child {
+         border-right: none;
+         }
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         }
+      </style>
+   </head>
+   <body>
+      <h1>Course Grades</h1>
+      <a href=" {{url_for('st_download_report')}}">Download report</a>
+      <a class="back-button" href="{{ url_for('dashboard') }}">Home</a>
+      <table>
+         <thead>
+            <tr>
+               <th>Course ID</th>
+               <th>Semester</th>
+               <th>Lecturer ID</th>
+               <th>Credit</th>
+               <th>Process</th>
+               <th>Mid</th>
+               <th>Final</th>
+               <th>AVG</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for grade in grades %}
+            <tr>
+               <td>{{ grade['courseID'] }}</td>
+               <td>{{ grade['semester'] }}</td>
+               <td>{{ grade['lecturerID'] }}</td>
+               <td>{{ grade['credit']}}</td>
+               <td>{{ grade['process'] }}</td>
+               <td>{{ grade['mid'] }}</td>
+               <td>{{ grade['final'] }}</td>
+               <td>{{ grade['avg'] }}</td>
+            </tr>
+            {% endfor %}
+            <p>GPA: {{avg_all}}</p>
+         </tbody>
+      </table>
+   </body>
+</html>

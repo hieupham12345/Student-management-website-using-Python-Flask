@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Test Schedule</title>
+      <style>
+         table {
+         font-family: arial, sans-serif;
+         border-collapse: collapse;
+         width: 50%;
+         }
+         td, th {
+         border: 1px solid #dddddd;
+         text-align: left;
+         padding: 8px;
+         }
+         tr:nth-child(even) {
+         background-color: #dddddd;
+         }
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         }
+      </style>
+   </head>
+   <body>
+      <h1>Test Schedule</h1>
+      <table>
+         <thead>
+            <tr>
+               <th>Course ID</th>
+               <th>Course Name</th>
+               <th>Classroom ID</th>
+               <th>Time</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for t in test %}
+            <tr>
+               <td>{{ t['Course ID'] }}</td>
+               <td>{{ t['Course Name'] }}</td>
+               <td>{{ t['ClassroomID']}}</td>
+               <td>{{t['Time']}}</td>
+            </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      <a class="back-button" href="{{ url_for('dashboard') }}">Home</a>
+   </body>
+</html>

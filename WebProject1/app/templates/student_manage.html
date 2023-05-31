@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Search Student</title>
+      <style>
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;}
+         table {
+         border-collapse: collapse;
+         width: 100%;
+         }
+         th, td {
+         text-align: left;
+         padding: 8px;
+         }
+         tr:nth-child(even) {
+         background-color: #f2f2f2;
+         }
+         th {
+         background-color: #4CAF50;
+         color: white;
+         }
+         .alert {
+         border: 1px solid transparent;
+         border-radius: 4px;
+         font-size: 16px;
+         position: fixed;
+         }
+      </style>
+   </head>
+   <body>
+      <div style="height: 200px; background-color: aquamarine;">
+         <div style="float:left;width: 90%;">
+            <h1>Search Student</h1>
+            <form action="/search_student" method="POST">
+               <label for="studentId">Student ID:</label>
+               <input type="text" id="studentId" name="studentId">
+               <label for="studentName">Student Name:</label>
+               <input type="text" id="studentName" name="studentName">
+               <label for="dateOfBirth">Date of Birth:</label>
+               <input type="date" id="dateOfBirth" name="dateOfBirth">
+               <label for="gender">Gender:</label>
+               <select id="gender" name="gender">
+                  <option value="">--  --</option>
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+               </select>
+               <label for="address">Address:</label>
+               <input type="text" id="address" name="address">
+               <label for="email">Email:</label>
+               <input type="email" id="email" name="email">
+               <label for="phoneNumber">Phone Number:</label>
+               <input type="tel" id="phoneNumber" name="phoneNumber">
+               <label for="class">Class:</label>
+               <select id="class" name="class">
+                  <option value="">--  --</option>
+                  {% for r in l_class %}
+                  <option value="{{r}}">{{r}}</option>
+                  {% endfor %}
+               </select>
+               <label for="faculty">Faculty:</label>
+               <select id="faculty" name="faculty">
+                  <option value="">--  --</option>
+                  {% for r in l_faculty %}
+                  <option value="{{r}}" >{{r}}</option>
+                  {%endfor%}
+               </select>
+               <input type="submit" value="Search">
+            </form>
+         </div>
+         <div style="float: right;width: 10%;">
+            <a class="back-button" href="{{ url_for('ad_user_home') }}" >Home</a>
+         </div>
+         {%if Message%}
+         <div class="alert">{{ Message}}</div>
+         {%endif%}
+      </div>
+      <div>
+         {% if st_list %}
+         <button onclick="downloadStudents()">Download</button>
+         <script>
+            function downloadStudents() {
+                if (confirm("Are you sure you want to download students data?")) {
+                window.location.href = "/download_student_search"
+                }
+            }
+         </script>
+         {%endif%}
+      </div>
+      <div style="  height: 500px; overflow-y: scroll; padding-right: 20px; ">
+         <h1>List of Student</h1>
+         <table>
+            <tr>
+               <th>ID</th>
+               <th>Name</th>
+               <th>Date of birth</th>
+               <th>Gender</th>
+               <th>Address</th>
+               <th>Email</th>
+               <th>Phone Number</th>
+               <th>Class ID</th>
+               <th>Faculty ID</th>
+            </tr>
+            {% for student in st_list %}
+            <tr>
+               <td>{{ student['studentID'] }}</td>
+               <td>{{ student['name'] }}</td>
+               <td>{{ student['dateOfBirth'] }}</td>
+               <td>{{ student['gender'] }}</td>
+               <td>{{ student['address'] }}</td>
+               <td>{{ student['email'] }}</td>
+               <td>{{ student['phoneNumber'] }}</td>
+               <td>{{ student['classID'] }}</td>
+               <td>{{ student['facultyID'] }}</td>
+            </tr>
+            {% endfor %}
+         </table>
+      </div>
+   </body>
+</html>

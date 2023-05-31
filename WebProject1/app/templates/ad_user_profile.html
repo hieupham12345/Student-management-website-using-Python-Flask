@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Profile</title>
+      <style>
+         table {
+         border-collapse: collapse;
+         width: 100%;
+         margin-bottom: 20px;
+         font-family: Arial, sans-serif;
+         color: #333;
+         background-color: #fff;
+         border: 2px solid #ccc;
+         }
+         th, td {
+         padding: 12px;
+         text-align: left;
+         border-bottom: 1px solid #ddd;
+         }
+         th {
+         background-color: #f2f2f2;
+         font-weight: bold;
+         text-transform: uppercase;
+         }
+         .back-button {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         background-color: #333;
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         }
+      </style>
+   </head>
+   <body>
+      <a class="back-button" href="{{ url_for('ad_user_home') }}">Home</a>
+      <h1>Profile</h1>
+      <table>
+         <tr>
+            <th>staff ID</th>
+            <td>{{ profile['staffID'] }}</td>
+         </tr>
+         <tr>
+            <th>Name</th>
+            <td>{{ profile['name'] }}</td>
+         </tr>
+         <tr>
+            <th>Date of Birth</th>
+            <td>{{ profile['dateOfBirth'] }}</td>
+         </tr>
+         <tr>
+            <th>Gender</th>
+            <td>{{ profile['gender'] }}</td>
+         </tr>
+         <tr>
+            <th>Address</th>
+            <td>{{ profile['address'] }}</td>
+         </tr>
+         <tr>
+            <th>Email</th>
+            <td>{{ profile['email'] }}</td>
+         </tr>
+         <tr>
+            <th>Phone</th>
+            <td>{{ profile['phoneNumber'] }}</td>
+         </tr>
+         <tr>
+            <th>Department ID</th>
+            <td>{{ profile['departmentID'] }}</td>
+         </tr>
+      </table>
+      <form action="/ad_user_update_info" method="POST">
+         <h2>Lecturer Information</h2>
+         <label for="name">Name:</label>
+         <input type="text" id="name" name="name"  style="width: 50%;"value="{{ profile['name'] }}"><br><br>
+         <label for="mail">Email:</label>
+         <input type="text" id="mail" name="mail"  style="width: 50%;"value="{{ profile['email'] }}"><br><br>
+         <label for="phone">Phone:</label>
+         <input type="tel" id="phone" name="phone"  style="width: 50%;"value="{{ profile['phoneNumber'] }}"><br><br>
+         <label for="address">Address:</label>
+         <input type="text" id="address" name="address"  style="width: 50%;"value="{{ profile['address'] }}"><br><br>
+         <input type="submit" value="Update Information">
+      </form>
+      {% if error_message %}
+      <p>{{ error_message }}</p>
+      {% endif %}
+   </body>
+</html>

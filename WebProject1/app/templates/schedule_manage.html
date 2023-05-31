@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <title>Schedule</title>
+      <style>
+         table {
+         border-collapse: collapse;
+         width: 50%;
+         }
+         th, td {
+         text-align: left;
+         padding: 8px;
+         border-bottom: 1px solid #ddd;
+         }
+         th {
+         background-color: #f2f2f2;
+         }
+         .left{
+         float: left;
+         width: 50%;}
+         .right{
+         float: right;
+         width: 50%;
+         }
+         .back-button{
+         position: fixed;
+         top:20px;
+         right:20px;
+         background-color: #333; 
+         color: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         }
+         .alert {
+         padding: 15px;
+         margin-bottom: 20px;
+         border: 1px solid transparent;
+         border-radius: 4px;
+         font-size: 16px;
+         position: fixed;
+         top:50px;
+         left: 50px;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="top" style="height: 200px; background-color: aquamarine;">
+         <a class="back-button" href="{{url_for('ad_user_home')}}">Home</a>
+         {% if Message %}
+         <div class="alert">{{ Message}}</div>
+         {% endif %}
+         <button class="add-schedule" style="            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;" onclick="showTestForm()">Add Schedule</button>
+         <div id="schedule-form" style="display: none; position: fixed; top: 160px; left: 20px; text-rendering: auto;">
+            <form action="{{url_for('input_schedule')}}" method="post">
+               <label for="schedule-select">Choose</label>
+               <select name="schedule" id="schedule-select">
+                  {% for r in list_schedule_input %}
+                  <option value="{{r['Course ID']}},{{r['Lecturer ID']}}">
+                     {{r['Faculty Name']}} - {{r['Course ID']}} - {{r['Course Name']}} - {{r['Lecturer Name']}}
+                  </option>
+                  {% endfor %}
+               </select>
+               <label for="room-select">Room:</label>
+               <select id="room-select" name="room">
+                  {% for room in l_room %}
+                  <option value="{{ room }}">
+                     {{ room }}
+                  </option>
+                  {% endfor %}
+               </select>
+               <label for="date-input">Date:</label>
+               <select id="date-input" name="date">
+                  <option value="mon">Monday</option>
+                  <option value="tue">Tuesday</option>
+                  <option value="wed">Wednesday</option>
+                  <option value="thu">Thursday</option>
+                  <option value="fri">Friday</option>
+                  <option value="sat">Saturday</option>
+               </select>
+               <label for="time-input" name="time">Time:</label>
+               <input type="time" id="time-input" name="time"> 
+               <label for="semester-select">Semester:</label>
+               <select id="semester-select" name="semester">
+                  <option value="">-- Chọn học kỳ --</option>
+               </select>
+               <button type="submit">Confirm</button>
+               <script>
+                  const select = document.getElementById("semester-select");
+                  const year = new Date().getFullYear();
+                  
+                  const option1 = document.createElement("option");
+                  option1.value = `${year}.1`;
+                  option1.text = `${year}.1`;
+                  select.add(option1);
+                  
+                  const option2 = document.createElement("option");
+                  option2.value = `${year}.2`;
+                  option2.text = `${year}.2`;
+                  select.add(option2);
+                  
+                  const option3 = document.createElement("option");
+                  option3.value = `${year}.3`;
+                  option3.text = `${year}.3`;
+                  select.add(option3);
+               </script>
+            </form>
+            <script>
+               function showTestForm() {
+                   document.getElementById("schedule-form").style.display = "block";
+               }
+            </script>
+         </div>
+      </div>
+      <div class="left">
+         <div>
+            <table>
+               <thead>
+                  <tr>
+                     <th>Schedule ID</th>
+                     <th>Course ID</th>
+                     <th>Day</th>
+                     <th>Time</th>
+                     <th>Classroom ID</th>
+                     <th>Lecturer ID</th>
+                     <th>Semester</th>
+                     <th>Select</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for schedule in l_schedule %}
+                  <tr>
+                     <td>{{ schedule.scheduleID }}</td>
+                     <td>{{ schedule.courseID }}</td>
+                     <td>{{ schedule.day }}</td>
+                     <td>{{ schedule.time }}</td>
+                     <td>{{ schedule.classroomID }}</td>
+                     <td>{{ schedule.lecturerID }}</td>
+                     <td>{{ schedule.semester }}</td>
+                     <td>
+                        <form action="{{ url_for('list_student_schedule') }}" method="post">
+                           <input type="hidden" name="scheduleid" value="{{ schedule.scheduleID }}">
+                           <button type="submit"> More</button>
+                        </form>
+                     </td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+      </div>
+      <div class="right">
+         <div>
+            <table>
+               <tr>
+                  <th>Student ID</th>
+                  <th>Student Name</th>
+                  <button onclick="addSTshowTestForm()">Add student</button>
+                  {% if st_list %}
+                  <button onclick="deleteSTshowTestForm()">Delete student</button>
+                  <form id="downloadForm" method="get" action="/download_schedule_student">
+                     <button onclick="confirmDownload(event)">Download</button>
+                  </form>
+                  <script>
+                     function confirmDownload(event) {
+                         event.preventDefault(); // Ngăn chặn hành vi mặc định của nút
+                     
+                         var result = confirm("Are you sure you want to download schedule?");
+                         if (result) {
+                             document.getElementById("downloadForm").submit();
+                         }
+                     }
+                  </script>
+                  <form id="delete-sc-form" method="get" action="/delete_schedule">
+                     <button onclick="confirmDelete(event)">Delete schedule</button>
+                  </form>
+                  <script>
+                     function confirmDelete(event){
+                     event.preventDefault();
+                     var result = confirm("Are you sure you want to delete schedule?");
+                     if (result){
+                         document.getElementById("delete-sc-form").submit()
+                     }
+                     }
+                  </script>
+                  {%endif%}
+               </tr>
+               {% for st in st_list %}
+               <tr>
+                  <td>{{st['Student ID']}}</td>
+                  <td>{{st['Name']}}</td>
+               </tr>
+               {% endfor %}
+            </table>
+            <div id="add-form" style="display: none;">
+               <form action="add_student_schedule" method="POST">
+                  <label for="studentid">Student ID:</label>
+                  <input type="text" name="studentid" id="studentid">
+                  <input type="submit" value="Add">
+               </form>
+               <script>
+                  function addSTshowTestForm() {
+                      document.getElementById("add-form").style.display = "block";
+                  }
+               </script>
+            </div>
+            <div id="delete-form" style="display: none;">
+               <form action="delete_student_schedule" method="post">
+                  <label for="studentid">Student ID:</label>
+                  <input type="text" name="studentid" id="studentid">
+                  <input type="submit" value="Delete">
+               </form>
+               <script>
+                  function deleteSTshowTestForm() {
+                      document.getElementById('delete-form').style.display = "block";
+                  }
+               </script>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>
