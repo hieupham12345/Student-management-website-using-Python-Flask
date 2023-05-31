@@ -13,11 +13,8 @@ class Student:
         self.classID = classID
         if Student.db_conn is None:
             Student.db_conn=DatabaseConnector('st').connect()
-    def update_info(self, name=None, email=None, phoneNumber=None, studentID=None,address=None):# update for student
+    def update_info(self, email=None, phoneNumber=None, studentID=None,address=None):# update for student
         cursor = Student.db_conn.cursor()
-        if name:
-            cursor.execute("UPDATE Student SET name=%s WHERE studentID=%s", (name, studentID))
-            self.name = name
         if email:
             cursor.execute("UPDATE Student SET email=%s WHERE studentID=%s", (email, studentID))
             self.email = email
@@ -163,12 +160,11 @@ def del_course():
 #update_info
 @app.route('/update_info', methods=['POST'])
 def update_info():
-    name = request.form['name']
     mail = request.form['mail']
     phone = request.form['phone']
     address=request.form['address']
     try:
-        st=Student().update_info(name,mail,phone,session['username'],address)
+        Student().update_info(mail,phone,session['username'],address)
     except Exception as e:
         error_message = f"Error updating profile: {str(e)}"
         return render_template('profile.html', error_message=error_message,profile=Student().get_info(session['username']))

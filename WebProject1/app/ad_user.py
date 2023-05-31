@@ -22,11 +22,8 @@ class AdminUser:
             if result is not None:
                 admin_info = AdminUser(result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7])
                 return admin_info
-    def update_info(self, name=None, email=None, phoneNumber=None, staffID=None,address=None):# update for
+    def update_info(self,  email=None, phoneNumber=None, staffID=None,address=None):# update for
         cursor=AdminUser.db_conn.cursor()
-        if name:
-            cursor.execute("UPDATE adminuser SET name=%s WHERE staffid=%s", (name, staffID))
-            self.name = name
         if email:
             cursor.execute("UPDATE adminuser SET email=%s WHERE staffid=%s", (email, staffID))
             self.email = email
@@ -259,15 +256,14 @@ def ad_user_home():
 #update info
 @app.route('/ad_user_update_info',methods=['POST'])
 def ad_user_update_info():
-    name = request.form['name']
     mail = request.form['mail']
     phone = request.form['phone']
     address=request.form['address']
     try:
-        lt=AdminUser().update_info(name,mail,phone,session['username'],address)
+        AdminUser().update_info(mail,phone,session['username'],address)
     except Exception as e:
         error_message = f"Error updating profile: {str(e)}"
-        return render_template('ad_user_profile.html', error_message=error_message,profile=lt)
+        return render_template('ad_user_profile.html', error_message=error_message,profile=AdminUser().get_info(session['username']))
     return redirect('/ad_user_profile')
 
 #test_schedule_manage

@@ -96,7 +96,7 @@
                            <input type="hidden" name="classroomid" value="{{ class['classroom ID'] }}">
                            <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
                            <input type="hidden" name="semester" value="{{class['Semester']}}">
-                           <input type="hidden" name="scheduleid" value="{{class['ScheduleID']}}">
+                           <input type="hidden" name="scheduleid" value="{{class['Schedule ID']}}">
                            <button type="submit">Select</button>
                         </form>
                      </td>
@@ -137,13 +137,14 @@
       </div>
       <div style="display: block; float: right; width: 50%;">
          {% for semester, classes in list_class_previous|groupby(attribute='Semester') %}
-         <h2>{{ semester }}</h2>
          <table>
             <div style="display: block;  right:20px">
+               <h2>{{semester}}</h2>
                <thead>
                   <tr>
                      <th>Course ID</th>
                      <th>Course Name</th>
+                     <th>Semester</th>
                      <th>Excel</th>
                      <th>Report pdf</th>
                   </tr>
@@ -153,6 +154,7 @@
                   <tr>
                      <td>{{ class['Course ID'] }}</td>
                      <td>{{ class['Course Name'] }}</td>
+                     <td>{{ class['Semester'] }}</td>
                      <td>
                         <form action="{{ url_for('down_report_grade') }}" method="post">
                            <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">

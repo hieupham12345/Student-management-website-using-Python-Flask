@@ -11,11 +11,9 @@ class Lecturer:
         self.phoneNumber = phoneNumber
         self.facultyID = facultyID
         Lecturer.db_conn=DatabaseConnector('lt').connect()
-    def update_info(self, name=None, email=None, phoneNumber=None, lecturerID=None,address=None):# update for
+    def update_info(self, email=None, phoneNumber=None, lecturerID=None,address=None):# update for
         cursor=Lecturer.db_conn.cursor()
-        if name:
-            cursor.execute("UPDATE lecturer SET name=%s WHERE lecturerid=%s", (name, lecturerID))
-            self.name = name
+    
         if email:
             cursor.execute("UPDATE lecturer SET email=%s WHERE lecturerid=%s", (email, lecturerID))
             self.email = email
@@ -130,15 +128,14 @@ def lecturer_profile():
 #update info
 @app.route('/lecturer_update_info',methods=['POST'])
 def lecturer_update_info():
-    name = request.form['name']
     mail = request.form['mail']
     phone = request.form['phone']
     address=request.form['address']
     try:
-        lt=Lecturer().update_info(name,mail,phone,session['username'],address)
+        Lecturer().update_info(mail,phone,session['username'],address)
     except Exception as e:
         error_message = f"Error updating profile: {str(e)}"
-        return render_template('lecturer_profile.html', error_message=error_message,profile=lt)
+        return render_template('lecturer_profile.html', error_message=error_message,profile=Lecturer().get_info(session['username']))
     return redirect('\lecturer_profile')
 
 #update_grade
@@ -212,20 +209,20 @@ def input_grade():
             avg=0
         else:
             avg=process*0.2 + mid*0.3 + final*0.5
-        
-        if result:
-            query="update grade set process=%s,mid=%s,final=%s,avg=%s where studentid=%s and courseid=%s and semester=%s"
-            cursor.execute(query,(process,mid,final,avg,studentid,session['courseid'],session['semester']))
-        else:
-            query="insert into grade (studentid,courseid,semester,lecturerid,process,mid,final,avg) values (%s,%s,%s,%s,%s,%s,%s,%s)"
-            cursor.execute(query,(studentid,session['courseid'],session['semester'],session['username'],process,mid,final,avg))
-        conn.commit()
-        if cursor.rowcount > 0:
-            c+=1
+        try:
+            if result:
+                query="update grade set process=%s,mid=%s,final=%s,avg=%s where studentid=%s and courseid=%s and semester=%s"
+                cursor.execute(query,(process,mid,final,avg,studentid,session['courseid'],session['semester']))
+            else:
+                query="insert into grade (studentid,courseid,semester,lecturerid,process,mid,final,avg) values (%s,%s,%s,%s,%s,%s,%s,%s)"
+                cursor.execute(query,(studentid,session['courseid'],session['semester'],session['username'],process,mid,final,avg))
+            conn.commit()
+            if cursor.rowcount > 0:
+                c+=1
+        except Exception as e:
+            message=f"Failed to update grades. {str(e)}"
     if c>0:
         message="success"
-    else:
-        message=f"Failed to update grades"
     # Retrieve the updated combined_list from the database
     l_grade_st = Lecturer().get_list_student_class_grade(session['semester'], session['courseid'], session['username'])
     list_student = Lecturer().get_list_student_class(session['scheduleid'])
