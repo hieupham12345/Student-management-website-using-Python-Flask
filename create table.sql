@@ -79,7 +79,7 @@ CREATE TABLE schedule (
 );
 
 CREATE TABLE student_schedule (
-  studentID varchar(8),
+  studentID char(8),
   scheduleid varchar(8),
   primary key(studentid,scheduleid),
   foreign key (studentid) references student(studentid),

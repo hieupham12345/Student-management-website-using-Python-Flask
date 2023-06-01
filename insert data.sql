@@ -242,7 +242,18 @@ VALUES
 ('ST000003','SC7'),
 ('ST000003','SC8'),
 ('ST000003','SC9'),
-('ST000003','SC10');
+('ST000003','SC10'),
+('ST000002','SC6'),
+('ST000002','SC7'),
+('ST000002','SC8'),
+('ST000002','SC9'),
+('ST000002','SC10'),
+('ST000001','SC6'),
+('ST000001','SC7'),
+('ST000001','SC8'),
+('ST000001','SC9'),
+('ST000001','SC10');
+
 
 INSERT INTO AdminUser (staffID, name, dateOfBirth, gender, address, email, phoneNumber, departmentID)
 VALUES
