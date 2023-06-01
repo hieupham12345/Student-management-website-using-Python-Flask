@@ -36,10 +36,10 @@ class Admin:
             fc={'Class ID':r[0],'Faculty Name':r[1],'Faculty ID':r[2]}
             l_fa_class.append(fc)
         return l_fa_class
-    def insert_student(self,studentID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='', classID='', facultyID=''):
+    def insert_student(self,studentID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='', classID=''):
         cursor=Admin.db_conn.cursor()
-        query="insert into student (studentid,name,dateofbirth,gender,address,email,phonenumber,classid,facultyid) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-        cursor.execute(query,(studentID,name,dateOfBirth,gender,address,email,phoneNumber,classID,facultyID,))
+        query="insert into student (studentid,name,dateofbirth,gender,address,email,phonenumber,classid) values (%s,%s,%s,%s,%s,%s,%s,%s)"
+        cursor.execute(query,(studentID,name,dateOfBirth,gender,address,email,phoneNumber,classID,))
         if cursor.rowcount>=1:
             Admin.db_conn.commit()
             return True
@@ -81,6 +81,7 @@ class Admin:
             fa={'Faculty ID': r[0],'Faculty Name':r[1]}
             l_faculty.append(fa)
         return l_faculty
+    
     def insert_lecturer(self,lecturerID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='',  facultyID=''):
         cursor=Admin.db_conn.cursor()
         query="insert into lecturer (lecturerid,name,dateofbirth,gender,address,email,phonenumber,facultyid) values (%s,%s,%s,%s,%s,%s,%s,%s)"
@@ -177,11 +178,8 @@ class Admin:
         cursor.execute("SHOW TABLES")
         tables = cursor.fetchall()
         with open("backup.sql", "w",encoding="utf-8") as f:
-            # Ghi lệnh để tạo cơ sở dữ liệu
             f.write("CREATE DATABASE IF NOT EXISTS database_name;\n")
             f.write("USE database_name;\n")
-
-            # Ghi từng bảng vào tệp
             for table in tables:
                 table_name = table[0]
                 cursor.execute("SELECT * FROM " + table_name)
@@ -205,7 +203,7 @@ class Admin:
         msg = Message('Back up file', sender=mail_user, recipients=[email,])
         msg.body = 'File back up database'
         
-        with open('D:/HIẾU/Học/Kì 2 2022-2023/WebProject1/WebProject1/backup.sql', 'rb') as f:
+        with open('backup.sql', 'rb') as f:
             data = f.read()
             msg.attach('backup.sql', 'application/octet-stream', data)
         mail.send(msg)
@@ -245,7 +243,7 @@ def input_student(): #cần insert student, account, send_mail
     selected=request.form['cl_faculty']
     classid,facultyid=selected.split(',')
     try:
-        Admin().insert_student(studentID=studentid,name=name,dateOfBirth=dob,gender=gender,email=mail,classID=classid,facultyID=facultyid)
+        Admin().insert_student(studentID=studentid,name=name,dateOfBirth=dob,gender=gender,email=mail,classID=classid)
         try:
             Admin().create_account(studentid,mail) ### mail từ request         
             mess='success. Account have been sended to user.'
