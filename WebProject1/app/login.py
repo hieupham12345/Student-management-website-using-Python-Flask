@@ -36,9 +36,15 @@ mail_pass=os.environ.get('outlook_mail_pass')
 app = Flask(__name__)
 app.secret_key = os.environ.get('flask_secret_key')
 
+
 @app.route('/')
 def home():
-	return render_template('login.html')
+    """
+    Trang chủ của ứng dụng web.
+    -Input: None
+    -Returns: HTML: Trang đăng nhập.
+    """
+    return render_template('login.html')
 
 mail = Mail()
 app.config['MAIL_SERVER'] = 'smtp.office365.com'
@@ -49,9 +55,17 @@ app.config['MAIL_PASSWORD'] = mail_pass
 mail.init_app(app)
 
 class DatabaseConnector:
+    """
+    Class Kết nối tới database
+    """
     def __init__(self, db_name):
         self.db_name = db_name
     def connect(self):
+        """
+        phương thức kết nối đến database
+        Input: chuỗi để nhận biết phân quyền user (student, lecturer, admin user, admin)
+        Return: None
+        """
         if self.db_name == 'st':
             config = {
                 'user': 'student',
@@ -90,10 +104,18 @@ class DatabaseConnector:
             return None
 
 class Login:
+    """
+    Class Đăng nhập 
+    """
     def __init__(self, username, password=''):
         self.username = username
         self.password = hashlib.sha256(password.encode('utf-8')).hexdigest()
     def login(self):
+        """
+        Phương thức: đăng nhập
+        -Input: username, password
+        -Return: true nếu đăng nhập thành không, false nếu đăng nhập thất bại  
+        """
         conn = DatabaseConnector(self.username[:2]).connect()
         cursor = conn.cursor()
         query = "select password from account where username=%s"
@@ -106,13 +128,21 @@ class Login:
         else:
             return False
 
-class PasswordChanger:   
+class PasswordChanger:
+    """
+    class thay đổi mật khẩu
+    """
     def __init__(self, username, old_password, new_password, confirm_password):
         self.username = username
         self.old_password = old_password
         self.new_password = new_password
         self.confirm_password = confirm_password  
     def change_password(self):
+        """
+        phương thức đổi mật khẩu
+        -Input: username, old_password,new_password, confirm_password
+        -Return: true nếu thay đổi mật khẩu thành không, false nếu thay đổi mật khẩu thất bại
+        """
         cnx = DatabaseConnector('ad').connect()
         cursor = cnx.cursor()
         
@@ -135,14 +165,27 @@ class PasswordChanger:
             return False
 
 class Reset_password: ###
+    """
+    class reset mật khẩu
+    """
     def __init__(self,username='',email=''):
         self.username=username
         self.email=email
     def generate_password(self):
+        """
+        phương thức: Lấy mật khẩu ngẫu nhiên 10 kí tự
+        -Input: None
+        -Return: Mật khẩu 10 kí tự ngẫu nhiên
+        """
         password_characters = string.ascii_letters + string.digits
         password = ''.join(random.choice(password_characters) for i in range(10))
         return password
     def change_pass(self):
+        """
+        phương thức: đổi mật khẩu
+        -Input: username, email
+        -Return: true nếu reset password thành công, false nếu thất bại
+        """
         conn=DatabaseConnector('ad').connect()
         cursor=conn.cursor()
         if self.username[:2] == 'st':
@@ -172,6 +215,11 @@ class Reset_password: ###
 failed_login_attempts = {}
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    hàm login
+    -Input: username, password
+    -Return: page dashboard nếu đăng nhập thành công, page login nếu đăng nhập thất bại
+    """
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -223,10 +271,20 @@ def login():
 #forget_pass
 @app.route('/forgot_password')
 def forgot_password():
-	return render_template('forgot_password.html')
+    """
+    hàm hướng đến page forgot_password
+    -Input: None
+    -Return: page forgot_password.html
+    """
+    return render_template('forgot_password.html')
 #reset_pass
 @app.route('/reset_password', methods=["POST"])
 def reset_password():
+    """
+    hàm thực thi reset password
+    -Input: username, email
+    -Return: message báo thành công hay thất bại
+    """
     username = request.form['username']
     email = request.form['email']
     a=Reset_password(username,email).change_pass()
@@ -237,16 +295,33 @@ def reset_password():
 #logout
 @app.route('/logout')
 def logout():
+    """
+    hàm logout
+    -Input: None
+    -Return: page login.html
+    """
     session.clear()
     return redirect(url_for('login'))
 
 #change_pass
 @app.route('/change_password')
 def change_password():
+    """
+    hàm hướng đến page đổi mật khẩu
+    -Input: none
+    -Return: page change_password.html
+    """
     tk=session['username']
     return render_template('change_password.html',tk=tk[:4])
+
+
 @app.route('/change_password_result',methods=['POST'])
 def change_password_result():
+    """
+    hàm thực thi đổi mật khẩu
+    -Input: username, old_password, new_password, confirm_new_password
+    -Return: Message báo thành công hoặc lỗi
+    """
     if request.method=='POST':
         username = session['username']
         old_password = request.form['old_password']
@@ -271,6 +346,9 @@ def change_password_result():
                 return render_template('change_password.html', message=message)
 
 class Schedule:
+    """
+    class thời khóa biểu
+    """
     def __init__(self, scheduleID='', courseID='', day='', time='', classroomID='', lecturerID='', semester=''):
         self.scheduleID = scheduleID
         self.courseID = courseID
@@ -280,6 +358,11 @@ class Schedule:
         self.lecturerID = lecturerID
         self.semester = semester
     def get_schedule(self,studentid): #tra ve schedule dang dict gom (coursename, day,time)
+        """
+        phương thức lấy thời khóa biểu
+        -Input: studentID
+        -Return: 1 list dictionary chứa thông tin thời khóa biểu sinh viên
+        """
         conn=DatabaseConnector('st').connect()
         cursor=conn.cursor()
         if studentid:
@@ -297,6 +380,9 @@ class Schedule:
             return schedule  
 
 class Grade:
+    """
+    class điểm số sinh viên
+    """
     def __init__(self, studentID='', courseID='', semester='', lecturerID='', process='',mid='',final='',avg='',credit=''):
         self.studentID = studentID
         self.courseID = courseID
@@ -308,6 +394,11 @@ class Grade:
         self.avg=avg
         self.credit=credit
     def get_grade(self,studentid): #get grade + credit
+        """
+        phương thức lấy điểm số sinh viên và số tín chỉ
+        -Input: studentID
+        -Return: 1 list dictionary chứ thông tin điểm số sinh viên
+        """
         conn=DatabaseConnector('st').connect()
         cursor=conn.cursor()
         if studentid:
@@ -321,6 +412,9 @@ class Grade:
         return list_gr
  
 class Course:
+    """
+    class môn học
+    """
     def __init__(self, courseID='', courseName='', facultyID='', credit='', description=None, previousCourse=None, followingCourse=None):
         self.courseID = courseID
         self.courseName = courseName
@@ -330,6 +424,11 @@ class Course:
         self.previousCourse = previousCourse
         self.followingCourse = followingCourse
     def get_course(self):
+        """
+        phương thức lấy danh sách môn học
+        -Input: None
+        -Return: 1 list dictionary chứa toàn bộ danh sách môn học
+        """
         conn=DatabaseConnector('st').connect()
         cursor=conn.cursor()
         query = "SELECT * FROM course"
@@ -344,12 +443,20 @@ class Course:
         return list_course
         
 class Tuitionfee:
+    """
+    class học phí
+    """
     def __init__(self,  tuitionFee='', status='', studentID='',sumcredit=''):
         self.tuitionFee = tuitionFee
         self.status = status
         self.studentID = studentID
         self.sumcredit=sumcredit
     def get_tuitionfee(self,studentid):
+        """
+        phương thức lấy thông tin học phí sinh viên
+        -Input: studentID
+        -Return: 1 dictionary chứa thông tin học phí sinh viên 
+        """
         conn=DatabaseConnector('st').connect()
         cursor=conn.cursor()
         if studentid:
@@ -363,12 +470,20 @@ class Tuitionfee:
                 return t
 
 class TestSchedule:
+    """
+    class lịch thi
+    """
     def __init__(self, scheduleID='',classroomID='', Time='', CourseID=''):
         self.scheduleID=scheduleID
         self.classroomID = classroomID
         self.Time = Time
         self.CourseID = CourseID
     def get_testschedule(self,studentid):  
+        """
+        phương thức lấy lịch thi
+        -input: studentID
+        -Return: 1 list dictionary chứa toàn bộ thông tin lịch thi của sinh viên
+        """
         conn=DatabaseConnector('st').connect()
         cursor=conn.cursor()
         if studentid:

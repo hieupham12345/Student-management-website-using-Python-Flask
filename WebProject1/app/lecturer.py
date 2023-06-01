@@ -1,5 +1,8 @@
 from login import *
 class Lecturer:
+    """
+    class giảng viên, gồm các phương thức giảng viên
+    """
     db_conn=None
     def __init__(self, lecturerID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='', facultyID=''):
         self.lecturerID = lecturerID
@@ -12,8 +15,12 @@ class Lecturer:
         self.facultyID = facultyID
         Lecturer.db_conn=DatabaseConnector('lt').connect()
     def update_info(self, email=None, phoneNumber=None, lecturerID=None,address=None):# update for
+        """
+        phương thức cập nhập thông tin cá nhân:
+        -Input: thông tin cần cập nhập (email, phone number, address, lecturerid)
+        -Return: None
+        """
         cursor=Lecturer.db_conn.cursor()
-    
         if email:
             cursor.execute("UPDATE lecturer SET email=%s WHERE lecturerid=%s", (email, lecturerID))
             self.email = email
@@ -25,6 +32,11 @@ class Lecturer:
             self.address=address
         Lecturer.db_conn.commit()
     def get_info(self,lecturerID):
+        """
+        phương thức lấy thông tin cá nhân user
+        -Input: lecturerID
+        -Return: 1 dictionary chứa thông tin user
+        """
         cursor = Lecturer.db_conn.cursor()
         if lecturerID:
             query = "SELECT * FROM lecturer WHERE lecturerID= %s"
@@ -34,6 +46,11 @@ class Lecturer:
                 lecturer_info = Lecturer(result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7])
                 return lecturer_info
     def get_list_class(self,lecturerID): #get list class của học kì này (trong schedule)
+        """
+        phương thức lấy danh sách class của học kì này cho giảng viên
+        -input: lecturerID
+        -return: 1 list dictionary chứa các thông tin lớp học tương ứng
+        """
         cursor=Lecturer.db_conn.cursor()
         cursor.execute("select distinct day,time,classroomid,course.courseid,coursename,semester,schedule.scheduleid,status from schedule inner join course on schedule.courseid=course.courseid  inner join attendance on schedule.scheduleid=attendance.scheduleid where schedule.lecturerid=%s",(lecturerID,))
         result=cursor.fetchall()
@@ -45,6 +62,11 @@ class Lecturer:
                 l_class.append(c)
         return l_class
     def get_list_class_previous(self,lecturerID): #list_class học  kì trước
+        """
+        phương thức lấy danh sách class của học kì trước cho giảng viên
+        -input: lecturerID
+        -return: 1 list dictionary chứa các thông tin lớp học tương ứng
+        """
         cursor=Lecturer.db_conn.cursor()
         cursor.execute("select distinct grade.courseid,coursename,semester from grade inner join course on grade.courseid=course.courseid where grade.lecturerid=%s",(lecturerID,))
         result=cursor.fetchall()
@@ -55,12 +77,22 @@ class Lecturer:
                 l_class_pre.append(c)
         return l_class_pre
     def get_list_student_class_previous(self,courseID,semester,lecturerID): #get list student học kì trước (from grade)
+        """
+        phương thức lấy danh sách sinh viên của học kì trước theo lớp tương ứng
+        -input: courseID, semester, lecturerID
+        -return: 1 list dictionary chứa các thông tin danh sách sinh viên của lớp học tương ứng
+        """
         query = "SELECT student.studentID, name, process,mid,final,avg FROM grade INNER JOIN student ON grade.studentid = student.studentid WHERE courseid = %s AND semester = %s AND lecturerid = %s;"
         cursor=Lecturer.db_conn.cursor()
         cursor.execute(query,(courseID,semester,lecturerID))
         results = cursor.fetchall()
         return results
     def get_list_student_class(self,scheduleid): #get list student học kì này (from schedule)
+        """
+        phương thức lấy danh sách sinh viên của học kì này theo lớp tương ứng
+        -input: courseID, semester, lecturerID
+        -return: 1 list dictionary chứa các thông tin danh sách sinh viên của lớp học tương ứng
+        """
         cursor=Lecturer.db_conn.cursor()
         cursor.execute("select student.studentid,name from student inner join student_schedule on student.studentid=student_schedule.studentid where scheduleid=%s",(scheduleid,))
         result=cursor.fetchall()
@@ -70,6 +102,11 @@ class Lecturer:
             st_list.append(st)
         return st_list
     def get_list_student_class_grade(self,semester,courseid,lecturerid):
+        """
+        phương thức lấy danh sách điểm số của sinh viên kèm studentID của môn học
+        -input: semester, courseID, lecturerID
+        -return: 1 list dictionary chứa các thông tin sinh viên và điểm số thỏa điều kiện
+        """
         cursor=Lecturer.db_conn.cursor()
         query="select studentid,process,mid,final from grade where semester=%s and courseid=%s and lecturerid=%s"
         cursor.execute(query,(semester,courseid,lecturerid))
@@ -80,6 +117,11 @@ class Lecturer:
             l_grade_st.append(gr)
         return l_grade_st
     def update_attendance(self,scheduleid,status):
+        """
+        phương thức update trạng thái điểm danh môn học
+        -input: chuỗi tương ứng open hay close 
+        -return: true nếu cập nhập trạng thái thành công, false nếu thất bại
+        """
         cursor=Lecturer.db_conn.cursor()
         if status=='open':
             query="update attendance set status='close' where scheduleid=%s"
@@ -91,6 +133,11 @@ class Lecturer:
             return True
         return False
     def get_list_attendance_st(self,lecturerid='',scheduleid=''):
+        """
+        phương thức lấy danh sách sinh viên có tham gia điểm danh
+        -input: lecturerID, scheduleID
+        -return: 1 list dictionary chứa thông tin danh sách thỏa điều kiện
+        """
         cursor=Lecturer.db_conn.cursor()
         if scheduleid!='':
             query="select student.studentid,name,note,attendance_add.scheduleid from attendance_add inner join student on attendance_add.studentid=student.studentid where scheduleid=%s"
@@ -105,6 +152,11 @@ class Lecturer:
             l_st_att.append(st)
         return l_st_att
     def delete_att_after_download(self,scheduleid):
+        """
+        phương thức xóa dữ liệu sinh viên đã điểm danh khỏi database sau khi giảng viên tải file chứa thông tin về
+        -input: scheduleID
+        -return: true nếu xóa thành công, false nếu thất bại
+        """
         cursor=Lecturer.db_conn.cursor()
         query="delete from attendance_add where scheduleid=%s"
         cursor.execute(query,(scheduleid,))
@@ -116,11 +168,21 @@ class Lecturer:
 #lecturer_home
 @app.route('/lecturer_home')
 def lecturer_home():
+    """
+    hàm hướng tới dashboard giảng viên
+    -input: none
+    -return: page lecturer_home.html
+    """
     return render_template('lecturer_home.html')
 
 #lecturer_profile
 @app.route('/lecturer_profile')
 def lecturer_profile():
+    """
+    hàm lấy thông tin profile user
+    -Input: none
+    -Return: page lecturer_profile.html với thông tin user tương ứng
+    """
     l=Lecturer().get_info(session['username'])
     l = l.__dict__
     return render_template('lecturer_profile.html',profile=l)
@@ -128,6 +190,11 @@ def lecturer_profile():
 #update info
 @app.route('/lecturer_update_info',methods=['POST'])
 def lecturer_update_info():
+    """
+    hàm cập nhập thông tin
+    -input: mail, phone, address
+    -return: message thông báo thành công hay thất bại
+    """
     mail = request.form['mail']
     phone = request.form['phone']
     address=request.form['address']
@@ -141,10 +208,20 @@ def lecturer_update_info():
 #update_grade
 @app.route('/update_grade')
 def update_grade():
+    """
+    hàm hướng đến page cập nhập điểm số
+    -input: none
+    -return: page update_grade.html
+    """
     return render_template('update_grade.html',list_class=Lecturer().get_list_class(session['username']),list_class_previous=Lecturer().get_list_class_previous(session['username']),l_att_st=Lecturer().get_list_attendance_st(session['username']))
 
 @app.route('/choose_student',methods=['POST'])
 def choose_student():
+    """
+    hàm hiện ra danh sách sinh viên để giảng viên chọn nhập điểm
+    -input: scheduleID, courseID, semester, lecturerID
+    -return: page update_grade.html với danh sách sinh viên tương ứng
+    """
     scheduleid=request.form['scheduleid']
     session['scheduleid']=scheduleid
     session['courseid']=request.form['courseid']
@@ -166,6 +243,11 @@ def choose_student():
 
 @app.route('/input_grade',methods=['POST'])
 def input_grade():
+    """
+    hàm nhập điểm cho sinh viên
+    -input: thông tin điểm số của sinh viên (process,mid,final), studentID, courseID, scheduleID, semester
+    -return: message báo thành công hay thất bại
+    """
     conn=DatabaseConnector('lt').connect()
     cursor=conn.cursor()
     c=0
@@ -245,6 +327,11 @@ def input_grade():
 
 @app.route('/down_report_grade', methods=['POST'])
 def down_report_grade():
+    """
+    hàm download báo cáo điểm số dạng file excel
+    -input: none
+    -return: file excel
+    """
     course_id = request.form['courseid']
     semester = request.form['semester']
     columns = ['Student ID', 'Full name', 'Process','Mid','Final','Avg']
@@ -258,6 +345,11 @@ def down_report_grade():
     return send_file(excel_io, download_name='Grade.xlsx', as_attachment=True)
 
 def setstyle_table(table):
+    """
+    hàm tạo kiểu cho table trong báo cáo pdf
+    -input: table (của module reportLab)
+    -return: table đã được tạo kiểu
+    """
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 1), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 1), colors.whitesmoke),
@@ -275,6 +367,11 @@ def setstyle_table(table):
     return table
     
 def draw_bar_chart(df): #for list student
+    """
+    hàm vẽ bar chart cho báo cáo giảng viên
+    -input: dataframe chứa thông tin điểm số tương ứng (cần có avg, và group by theo số lượng)
+    -return: file pdf chứa biểu đồ
+    """
     with pdf.PdfPages('bar_chart.pdf') as pdf_file:
         # Create a bar chart
         bins=[0,1,2,3,4,4.999,6,7,8,9,10]
@@ -293,6 +390,11 @@ def draw_bar_chart(df): #for list student
     return 'bar_chart.pdf'
 
 def draw_pie_chart(df):
+    """
+    hàm vẽ pie chart cho báo cáo giảng viên
+    -input: dataframe chứa thông tin điểm số tương ứng (cần có avg, và group by theo số lượng)
+    -return: file pdf chứa biểu đồ
+    """
     with PdfPages('pie-chart.pdf') as pdf:
         # Create the second chart
         labels=['Fail','Pass']
@@ -319,6 +421,11 @@ def draw_pie_chart(df):
 
 @app.route('/down_report_grade_pdf', methods=['POST'])
 def down_report_grade_pdf():
+    """
+    hàm tải xuống báo cáo pdf cho giảng viên
+    -input: none
+    -return: file báo cáo pdf
+    """
     pdfmetrics.registerFont(TTFont('Tahoma', 'tahoma.ttf'))
     courseid = request.form.get('courseid')
     semester = request.form.get('semester')
@@ -376,7 +483,12 @@ def down_report_grade_pdf():
         return render_template('update_grade.html',list_class=Lecturer().get_list_class(session['username']),list_class_previous=Lecturer().get_list_class_previous(session['username']),message=message)
 
 @app.route('/update_attendance',methods=['POST'])
-def update_attendance():  
+def update_attendance(): 
+    """
+    hàm cập nhập trạng thái điểm danh
+    -input: trạng thái (open hay close)
+    -return: message
+    """
     scheduleid=request.form['scheduleid']
     status=request.form['status']
     try:
@@ -388,6 +500,11 @@ def update_attendance():
 
 @app.route('/down_report_att',methods=['POST'])
 def down_report_att():
+    """
+    hàm tải xuống báo cáo thông tin điểm danh dạng file excel
+    -input: none
+    -return: file excel
+    """
     scheduleid=request.form['scheduleid']
     l_att_st=Lecturer().get_list_attendance_st(scheduleid=scheduleid)
     df=pd.DataFrame(l_att_st)

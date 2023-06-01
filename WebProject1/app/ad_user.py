@@ -2,6 +2,9 @@ from login import *
 from lecturer import draw_pie_chart,draw_bar_chart,setstyle_table
 
 class AdminUser:
+    """
+    class cho admin user
+    """
     db_conn = None
     def __init__(self, staffID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='', departmentID=''):
         self.staffID = staffID
@@ -14,6 +17,11 @@ class AdminUser:
         self.departmentID = departmentID
         AdminUser.db_conn=DatabaseConnector('ad').connect()
     def get_info(self,staffID):
+        """
+        phương thức lấy thông tin cá nhân nhân viên
+        -Input: staffID
+        -Return: 1 dictionary chứa thông tin nhân viên
+        """
         cursor = AdminUser.db_conn.cursor()
         if staffID:
             query = "SELECT * FROM adminuser WHERE staffid= %s"
@@ -23,6 +31,11 @@ class AdminUser:
                 admin_info = AdminUser(result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7])
                 return admin_info
     def update_info(self,  email=None, phoneNumber=None, staffID=None,address=None):# update for
+        """
+        phương thức cập nhập thông tin cá nhân:
+        -Input: thông tin cần cập nhập (email, phone number, address, staffid)
+        -Return: None
+        """
         cursor=AdminUser.db_conn.cursor()
         if email:
             cursor.execute("UPDATE adminuser SET email=%s WHERE staffid=%s", (email, staffID))
@@ -34,16 +47,12 @@ class AdminUser:
             cursor.execute("Update adminuser set address=%s where staffid=%s",(address,staffID))
             self.address=address
         AdminUser.db_conn.commit()
-    def get_lecturerid(self):
-        cursor=AdminUser.db_conn.cursor()
-        cursor.execute("select lecturerid,name from lecturer")
-        result=cursor.fetchall()
-        l_lt=[]
-        for r in result:
-            lt={'Lecturer ID':r[0],'Name':r[1]}
-            l_lt.append(lt)
-        return l_lt
     def get_room(self): #lấy danh sách phòng
+        """
+        phương thức lấy danh sách phòng học/thi
+        -input: noe
+        -return: 1 danh sách các phòng học
+        """
         cursor=AdminUser.db_conn.cursor()
         cursor.execute("select * from classroom")
         result=cursor.fetchall()
@@ -52,6 +61,11 @@ class AdminUser:
             l_room.append(r[0])
         return l_room
     def get_test_schedule_list(self): #lấy danh sách lịch thi
+        """
+        phương thức lấy danh sách lịch thi
+        -input: noe
+        -return: 1 list dictionary chứa thông tin lịch thi
+        """
         cursor=AdminUser.db_conn.cursor()
         cursor.execute("select scheduleID,course.coursename,course.courseid, time,classroomid from testschedule inner join course on testschedule.courseid=course.courseid")
         result=cursor.fetchall()
@@ -61,6 +75,11 @@ class AdminUser:
             test_list.append(test)
         return test_list
     def get_list_student_test(self, scheduleid): #lấy danh sách sinh viên của của  schedule/testschedule
+        """
+        phương thức lấy danh sách sinh viên của thời khóa biểu/ lịch thi ( do lịch thi phụ thuộc thời khóa biểu)
+        -input: scheduleID
+        -return: 1 list dictionary chứa các thông tin sinh viên thỏa điều kiện
+        """
         cursor = AdminUser.db_conn.cursor()
         cursor.execute("select student.studentid,name from student_schedule inner join student on student_schedule.studentid=student.studentid where scheduleid=%s",(scheduleid,))
         result = cursor.fetchall()
@@ -70,6 +89,11 @@ class AdminUser:
             ds_st.append(st)
         return ds_st
     def insert_test_schedule(self,scheduleid,classroomID,time,courseid,lecturerid): #add lịch thi vào testschedule
+        """
+        phương thức insert vào bảng test schedule
+        -input: scheduleID, classroomID, time, courseID, lecturerID
+        -return: true nếu insert thành công, false nếu thất bại
+        """
         cursor=AdminUser.db_conn.cursor()
         query = "insert into testschedule (scheduleID,classroomID,time,courseid,lecturerid) values (%s,%s,%s,%s,%s)"
         cursor.execute(query,(scheduleid,classroomID,time,courseid,lecturerid,))
@@ -78,6 +102,11 @@ class AdminUser:
             return True
         return False       
     def get_test_from_schedule(self): #lấy danh sách thời khóa biểu để chọn thêm  vào testschedule
+        """
+        lấy danh sách thời khóa biểu để chọn thêm  vào testschedule (do test schedule phụ thuộc schedule)
+        -input: none
+        -return: 1 list dictionary chứa thông tin thời khóa biểu        
+        """
         cursor=AdminUser.db_conn.cursor()
         cursor.execute("select distinct scheduleid,courseid,day,time from schedule where scheduleid not in (select scheduleid from testschedule)")
         result=cursor.fetchall()
@@ -87,10 +116,20 @@ class AdminUser:
             ds_test.append(test)
         return ds_test
     def delete_from_test_schedule(self,scheduleid): #xóa lịch thi khỏi testschedule
+        """
+        phương thức xóa lịch thi
+        -input: scheduleID
+        -return: none
+        """
         cursor=AdminUser.db_conn.cursor()
         cursor.execute("delete from testschedule where scheduleid=%s",(scheduleid,))
         AdminUser.db_conn.commit()   
     def get_schedule(self):#get danh sách schedule
+        """
+        phương thức lấy danh sách thời khóa biểu
+        -input: none
+        -return: 1 list dictionary chứa thông tin thời khóa biểu
+        """
         cursor=AdminUser.db_conn.cursor()
         query="select  scheduleid,courseid,day,time,classroomid,lecturerid,semester from schedule"
         cursor.execute(query)
@@ -100,7 +139,12 @@ class AdminUser:
             schedule=Schedule(r[0],r[1],r[2],r[3],r[4],r[5],r[6]).__dict__
             l_schedule.append(schedule)
         return l_schedule
-    def get_list_schedule_input(self):#lấy 1 table gồm: facultyID, courseID, courseName,lecturerID,lecturerName để chọn add schedule
+    def get_list_schedule_input(self):
+        """
+        lấy 1 table gồm: facultyID, courseID, courseName,lecturerID,lecturerName để chọn add schedule (chọn giảng viên, môn học phải chung khoa)
+        -input: none
+        -return: 1 list dictionary chứa các thông tin thỏa điều kiện
+        """
         cursor=AdminUser().db_conn.cursor()
         query="select course.facultyid,facultyname,courseid,coursename,lecturer.lecturerid,lecturer.name from course inner join lecturer on course.facultyid=lecturer.facultyid inner join faculty on lecturer.facultyid=faculty.facultyID"
         cursor.execute(query)
@@ -111,6 +155,11 @@ class AdminUser:
             l_add.append(a)
         return l_add
     def insert_schedule(self,courseid,date,time,classroomid,lecturerid,semester): #insert schedule
+        """
+        phương thức insert vào schedule
+        -input: courseid, date, time, classroomID, lecturerID, semester
+        -return: true nếu insert thành công, false nếu thất bại
+        """
         cursor=AdminUser.db_conn.cursor()
         cursor.execute("select max(scheduleid) from schedule")
         result=cursor.fetchone()
@@ -123,6 +172,11 @@ class AdminUser:
             return True
         return False     
     def add_student_schedule(self,studentid,scheduleid): #thêm sinh viên vào schedule
+        """
+        phương thức thêm sinh viên vào thời khóa biểu
+        -input: studentID, scheduleID
+        -return: true nếu insert thành công, false nếu thất bại
+        """
         cursor=AdminUser.db_conn.cursor()
         query="insert into student_schedule (studentid,scheduleid) values (%s,%s)"
         cursor.execute(query,(studentid,scheduleid))
@@ -131,6 +185,11 @@ class AdminUser:
             return True
         return False
     def delete_student_schedule(self,scheduleid,studentid=''): #xóa từng sinh viên khỏi schedule
+        """
+        phương thức delete sinh viên từ thời khóa biểu
+        -input: scheduleID, studentID
+        -return: true nếu xóa thành công, false nếu thất bại
+        """
         cursor=AdminUser.db_conn.cursor()
         if studentid:
             query="delete from student_schedule where studentid=%s and scheduleid = %s"
@@ -143,6 +202,11 @@ class AdminUser:
             return True
         return False
     def get_scheduleinfo_by(self, scheduleid): #lấy thông tin schedule để xuất file excel
+        """
+        phương thức lấy thông tin thời khóa biểu để xuất file excel
+        -input: scheduleID
+        -return: 1 dictionary chứa thông tin thời khóa biểu theo scheduleID
+        """
         cursor = AdminUser.db_conn.cursor()
         query = "SELECT schedule.courseid, coursename, day, time, classroomID, name, semester FROM course INNER JOIN schedule ON course.courseid=schedule.courseid INNER JOIN lecturer ON schedule.lecturerid=lecturer.lecturerid WHERE scheduleid=%s"
         cursor.execute(query, (scheduleid,))
@@ -153,6 +217,11 @@ class AdminUser:
         else:
             return {}
     def delete_schedule(self,scheduleid): #xóa schedule sau khi xóa từng record của table student_schedule
+        """
+        phương thức xóa schedule sau khi xóa từng record của table student_schedule
+        -input: scheduleID
+        -return: true nếu xóa thành công, false nếu thất bại
+        """
         cursor=AdminUser.db_conn.cursor()
         query="delete from schedule where scheduleid=%s"
         cursor.execute(query,(scheduleid,))
@@ -161,6 +230,11 @@ class AdminUser:
             return True
         return False
     def search_student(self,studentid='',studentname='',dob='',gender='',address='',email='',phone='',classid='',facultyid=''):
+        """
+        phương thức search student theo toàn bộ thông tin cá nhân, tìm kiếm gần đúng
+        -input: 1 hoặc nhiều thông tin cá nhân
+        -return: 1 list dictionary chứa các thông tin sinh viên thỏa điều kiện
+        """
         cursor=AdminUser.db_conn.cursor()
         query = "SELECT student.*,facultyid FROM student inner join faculty_class on student.classid=faculty_class.classid WHERE 1=1"
         conditions = []
@@ -194,6 +268,11 @@ class AdminUser:
             st_list.append(re)
         return st_list
     def get_list_class_student(self):
+        """
+        lấy danh sách lớp sinh viên từ table studentclass
+        -input: none
+        -return: 1 list chứa toàn bộ classID
+        """
         cursor=AdminUser.db_conn.cursor()
         query="select classid from studentclass"
         cursor.execute(query)
@@ -204,6 +283,11 @@ class AdminUser:
             l_class.append(re)
         return l_class
     def get_list_faculty(self):
+        """
+        lấy danh sách khoa
+        -input: none
+        -return: 1 list chứa toàn bộ facultyID
+        """
         cursor=AdminUser.db_conn.cursor()
         query="select facultyid from faculty"
         cursor.execute(query)
@@ -214,6 +298,11 @@ class AdminUser:
             l_faculty.append(re)
         return l_faculty    
     def search_grade(self,studentid='',name='',courseid='',semester='',lecturerid='',classid='',facultyid=''):
+        """
+        phương thức search student theo một số thông tin cá nhân để lọc danh sách điểm số, tìm kiếm gần đúng
+        -input: 1 hoặc nhiều thông tin cá nhân
+        -return: 1 list dictionary chứa các thông tin sinh viên thỏa điều kiện
+        """
         cursor=AdminUser.db_conn.cursor()
         query="select student.name,student.classid,facultyid,grade.* from student inner join grade on student.studentid=grade.studentid inner join faculty_class on student.classid=faculty_class.classid where 1=1"
         conditions=[]
@@ -247,15 +336,30 @@ class AdminUser:
 
 @app.route('/ad_user_profile')
 def ad_user_profile():
+    """
+    hàm hướng tới profile user
+    -input: none
+    -return: page ad_user_profile.html
+    """
     return render_template('ad_user_profile.html',profile=AdminUser().get_info(session['username']))
 
 @app.route('/ad_user_home')
 def ad_user_home():
+    """
+    hàm hướng tới dashboard của user
+    -input: none
+    -return: page ad_user_home.html
+    """
     return render_template('ad_user_home.html')
 
 #update info
 @app.route('/ad_user_update_info',methods=['POST'])
 def ad_user_update_info():
+    """
+    hàm cập nhập thông tin
+    -input: mail, phone, address
+    -return: message thông báo thành công hay thất bại
+    """
     mail = request.form['mail']
     phone = request.form['phone']
     address=request.form['address']
@@ -269,11 +373,21 @@ def ad_user_update_info():
 #test_schedule_manage
 @app.route('/test_schedule_manage')
 def test_schedule_manage():
+    """
+    hàm hướng tới page schedule_manage
+    -input: none
+    -return: page test_schedule_manage.html
+    """
     return render_template('test_schedule_manage.html',test_list=AdminUser().get_test_schedule_list(),test_list_schedule=AdminUser().get_test_from_schedule(),l_room=AdminUser().get_room(),l_lt=AdminUser().get_lecturerid())
 
 
 @app.route('/add_test_schedule',methods=['POST'])
 def add_test_schedule():
+    """
+    hàm thêm lịch thi mới
+    -input: scheduleID, courseID, date, time, lecturerID
+    -return: message báo thành công hay thất bại
+    """
     selected = request.form['test']
     scheduleid,courseid= selected.split(',')
     room_test=request.form['room']
@@ -288,11 +402,21 @@ def add_test_schedule():
 
 @app.route('/list_student_test',methods=['POST'])
 def list_student_test():
+    """
+    hàm lấy danh sách sinh viên của 1 lịch thi 
+    -input: scheduleID
+    -return: page test_schedule_manage.html với danh sách sinh viên tương ứng
+    """
     scheduleid=request.form['scheduleid']
     return render_template('test_schedule_manage.html',test_list=AdminUser().get_test_schedule_list(),test_list_schedule=AdminUser().get_test_from_schedule(),l_room=AdminUser().get_room(),st_list=AdminUser().get_list_student_test(scheduleid))
 
 @app.route('/delete_test_schedule',methods=['POST'])
 def delete_test_schedule():
+    """
+    hàm xóa lịch thi
+    -input: scheduleID
+    -return: message báo thành công hay thất bại
+    """
     scheduleid=request.form['scheduleid']
     try:
         a=AdminUser().delete_from_test_schedule(scheduleid)
@@ -303,10 +427,20 @@ def delete_test_schedule():
 
 @app.route('/schedule_manage')
 def schedule_manage():
+    """
+    hàm hướng tới page schedule_manage
+    -input: none
+    -return: page schedule_manage.html
+    """
     return render_template('schedule_manage.html',l_schedule=AdminUser().get_schedule(),list_schedule_input=AdminUser().get_list_schedule_input(),l_room=AdminUser().get_room())
 
 @app.route('/input_schedule',methods=['POST'])
 def input_schedule():
+    """
+    hàm thêm 1 lịch thời khóa biểu mới
+    -inputL courseID, lecturerID, classroomID, date, time, semester
+    -return: message báo thêm thành công hay thất bại
+    """
     selected=request.form['schedule']
     courseid,lecturerid=selected.split(',')
     classroomid=request.form['room']
@@ -322,6 +456,11 @@ def input_schedule():
 
 @app.route('/list_student_schedule',methods=['POST'])
 def list_student_schedule():
+    """
+    hàm lấy danh sách sinh viên của 1 lịch thời khóa biểu
+    -input: scheduleID
+    -return: page schedule_manage.html với danh sách sinh viên tương ứng
+    """
     scheduleid=request.form['scheduleid']
     session['scheduleid']=scheduleid
     st_list=AdminUser().get_list_student_test(scheduleid)
@@ -331,6 +470,11 @@ def list_student_schedule():
 
 @app.route('/add_student_schedule',methods=['POST'])
 def add_student_schedule():
+    """
+    hàm thêm 1 sinh viên mới vào lịch thời khóa biểu
+    -input: studentID, scheduleID
+    -return: message báo thành công hay thất bại
+    """
     studentid=request.form['studentid']
     scheduleid=session.get('scheduleid')
     if scheduleid is None:
@@ -346,6 +490,11 @@ def add_student_schedule():
 
 @app.route('/delete_student_schedule',methods=['POST'])
 def delete_student_schedule():
+    """
+    hàm delete sinh viên khỏi lịch thời khoa biểu
+    -input: studentID, scheduleID
+    -return: message báo thành công hay thất bại
+    """
     studentid=request.form['studentid']
     scheduleid=session['scheduleid']
     try:
@@ -355,9 +504,13 @@ def delete_student_schedule():
         mess=f"fail: {str(e)}"
     return render_template('schedule_manage.html',l_schedule=AdminUser().get_schedule(),list_schedule_input=AdminUser().get_list_schedule_input(),l_room=AdminUser().get_room(),st_list=AdminUser().get_list_student_test(scheduleid),Message=mess)
 
-from flask import send_file
 @app.route('/download_schedule_student')
 def download_schedule_student():
+    """
+    hàm download lịch thời khóa biểu file excel
+    -input: none
+    -return: file excel
+    """
     schedule_info=AdminUser().get_scheduleinfo_by(session['scheduleid'])
     try:
         student_list = AdminUser().get_list_student_test(session['scheduleid'])
@@ -380,6 +533,11 @@ def download_schedule_student():
 
 @app.route('/delete_schedule')
 def delete_schedule():
+    """
+    hàm xóa lịch thời khóa biểu
+    -input: scheduleID
+    -return: message báo thành công hay thất bại
+    """
     scheduleid=session['scheduleid']
     st_list=AdminUser().get_list_student_test(scheduleid)
     if len(st_list)>0:
@@ -393,12 +551,22 @@ def delete_schedule():
 
 @app.route('/student_manage')
 def student_manage():
+    """
+    hàm hướng tới page student_manage
+    -input: none
+    -return: page student_manage với thông tin danh sách lớp và khoa
+    """
     l_class=AdminUser().get_list_class_student()
     l_faculty=AdminUser().get_list_faculty()
     return render_template('student_manage.html',l_class=l_class,l_faculty=l_faculty)
 
 @app.route('/search_student',methods=['POST'])
 def search_student():
+    """
+    hàm search student
+    -input: 1 hoặc nhiều thông tin cá nhân sinh viên
+    -return: page student_manage.html với danh sách sinh viên đã tìm thỏa điều kiện
+    """
     if request.method == 'POST':
         session['student_id'] = request.form['studentId']
         session['student_name'] = request.form['studentName']
@@ -415,6 +583,11 @@ def search_student():
 
 @app.route('/download_student_search')
 def download_student_search():
+    """
+    hàm download file excel chứa thông tin sinh viên tìm qua search function
+    -input: none
+    -return: file excel
+    """
     try:
         st_list = AdminUser().search_student(session.get('student_id'),session.get('student_name'),session.get('date_of_birth'),session.get('gender'),session.get('address'),session.get('email'),session.get('phone_number'),session.get('selected_class'),session.get('selected_faculty'))
         df=pd.DataFrame(st_list)
@@ -431,10 +604,20 @@ def download_student_search():
 
 @app.route('/grade_manage')
 def grade_manage():
+    """
+    hàm hướng tới page grade_manage.html
+    -input: none
+    -return: page grade_manage.html với thông tin danh sách lớp học sinh viên và khoa
+    """
     return render_template('grade_manage.html',l_class=AdminUser().get_list_class_student(),l_faculty=AdminUser().get_list_faculty())
 
 @app.route('/search_student_grade',methods=['POST'])
 def search_student_grade():
+    """
+    hàm search student với điểm số
+    -input: 1 hoặc nhiều thông tin cá nhân sinh viên
+    -return: page student_manage.html với danh sách sinh viên đã tìm thỏa điều kiện
+    """
     if request.method == 'POST':
         session['student_id'] = request.form['studentid']
         session['student_name'] = request.form['studentname']
@@ -448,6 +631,11 @@ def search_student_grade():
 
 @app.route('/download_student_grade_data')
 def download_student_grade_data():
+    """
+    hàm download file excel chứa thông tin điểm số sinh viên tìm qua search function
+    -input: none
+    -return: file excel
+    """
     column=['StudentID','Name','ClassID','FacultyID','CourseID','Semester','LecturerID','process','mid','final','avg']
     st_list_gr = AdminUser().search_grade(session.get('student_id'),session.get('student_name'),session.get('courseid'),session.get('semester'),session.get('lecturerid'),session.get('selected_class'),session.get('selected_faculty'))
     df=pd.DataFrame(st_list_gr,columns=column)
@@ -460,6 +648,11 @@ def download_student_grade_data():
 
 @app.route('/download_student_grade_data_pdf')
 def download_student_grade_data_pdf():
+    """
+    hàm download file report pdf chứa thông tin điểm số sinh viên tìm qua search function
+    -input: none
+    -return: file pdf
+    """
     column=['StudentID','Name','ClassID','FacultyID','CourseID','Semester','LecturerID','process','mid','final','avg']
     st_list_gr = AdminUser().search_grade(session.get('student_id'),session.get('student_name'),session.get('courseid'),session.get('semester'),session.get('lecturerid'),session.get('selected_class'),session.get('selected_faculty'))
     df=pd.DataFrame(st_list_gr,columns=column)

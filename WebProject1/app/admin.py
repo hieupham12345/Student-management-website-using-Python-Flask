@@ -4,10 +4,18 @@ from lecturer import Lecturer
 from student import Course
 
 class Admin:
+    """
+    class chứa phương thức của admin
+    """
     db_conn=None
     def __init__(self):
         Admin.db_conn=DatabaseConnector('adminadmin').connect()
     def get_max_studentid(self): #for input
+        """
+        phương thức lấy studentID lớn nhất hiện tại (để tự động cập nhập studentID khi thêm sinh viên mới)
+        -input: note
+        -return: max studentID
+        """
         cursor = Admin.db_conn.cursor()
         query = "SELECT MAX(studentid) FROM student;"
         cursor.execute(query)
@@ -18,6 +26,11 @@ class Admin:
             new_id = 'ST' +'0'*(6-len(str(int(result[2:])+1)))+ str(int(result[2:]) + 1)
         return new_id
     def get_max_lecturerid(self): #for input
+        """
+        phương thức lấy lecturerID lớn nhất hiện tại (để tự động cập nhập lecturerID khi thêm sinh viên mới)
+        -input: note
+        -return: max lecturerID
+        """
         cursor = Admin.db_conn.cursor()
         query = "SELECT MAX(lecturerid) FROM lecturer;"
         cursor.execute(query)
@@ -28,6 +41,11 @@ class Admin:
             new_id = 'LT' +'0'*(6-len(str(int(result[2:])+1)))+ str(int(result[2:]) + 1)
         return new_id
     def get_faculty_class(self):
+        """
+        phương thức lấy danh sách khoa và lớp học tương ứng theo cặp khoa - lớp học
+        -input: note
+        -return: 1 list dictionary chứa thông tinh tương ứng
+        """
         cursor=Admin.db_conn.cursor()
         cursor.execute("select studentclass.classid,facultyname,faculty_class.facultyID from studentclass inner join faculty_class on studentclass.classid=faculty_class.classid inner join faculty on faculty_class.facultyid=faculty.facultyid")
         result=cursor.fetchall()
@@ -37,6 +55,11 @@ class Admin:
             l_fa_class.append(fc)
         return l_fa_class
     def insert_student(self,studentID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='', classID=''):
+        """
+        phương thức insert sinh viên mới
+        -input: thông tin sinh viên
+        -return: true nếu insert thành công, false nếu thất bại
+        """
         cursor=Admin.db_conn.cursor()
         query="insert into student (studentid,name,dateofbirth,gender,address,email,phonenumber,classid) values (%s,%s,%s,%s,%s,%s,%s,%s)"
         cursor.execute(query,(studentID,name,dateOfBirth,gender,address,email,phoneNumber,classID,))
@@ -45,6 +68,11 @@ class Admin:
             return True
         return False
     def create_account(self,id,user_mail): #create account and send mail
+        """
+        phương thức tự động tạo account mới (insert vào table account) và gửi mail cho user sau khi admin insert new user
+        -input: id, user_mail
+        -return: true nếu gửi mail thành công, false nếu thất bại
+        """
         cursor=Admin.db_conn.cursor()
         random_password=Reset_password().generate_password()
         query="insert into account (username,password) values (%s,sha2(%s,256))"
@@ -58,6 +86,11 @@ class Admin:
             return True
         return False
     def delete_student(self, id):
+        """
+        phương thức xóa sinh viên
+        -input: studentID
+        -return: true nếu xóa thành công, false nếu thất bại
+        """
         cursor = Admin.db_conn.cursor()
         try:
             cursor.execute("START TRANSACTION")
@@ -73,16 +106,13 @@ class Admin:
         except Exception as e:
             Admin.db_conn.rollback()
             return str(e)
-        cursor=AdminUser.db_conn.cursor()
-        cursor.execute("select facultyid,facultyname from faculty")
-        result=cursor.fetchall()
-        l_faculty=[]
-        for r in result:
-            fa={'Faculty ID': r[0],'Faculty Name':r[1]}
-            l_faculty.append(fa)
-        return l_faculty
-    
+
     def insert_lecturer(self,lecturerID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='',  facultyID=''):
+        """
+        phương thức thêm 1 giảng viên mới:
+        -input: thông tin cá nhân giảng viên
+        -return: true nếu insert thành công, false nếu thất bại
+        """
         cursor=Admin.db_conn.cursor()
         query="insert into lecturer (lecturerid,name,dateofbirth,gender,address,email,phonenumber,facultyid) values (%s,%s,%s,%s,%s,%s,%s,%s)"
         cursor.execute(query,(lecturerID,name,dateOfBirth,gender,address,email,phoneNumber,facultyID,))
@@ -91,6 +121,11 @@ class Admin:
             return True
         return False
     def delete_lecturer(self, id):
+        """
+        phương thức xóa giảng viên
+        -input: studentID
+        -return: true nếu xóa thành công, false nếu thất bại
+        """
         cursor = Admin.db_conn.cursor()
         try:
             cursor.execute("START TRANSACTION")
@@ -107,6 +142,11 @@ class Admin:
             Admin.db_conn.rollback()
             return str(e)
     def search_lecturer(self,lecturerid='',studentname='',dob='',gender='',address='',email='',phone='',facultyid=''):
+        """
+        phương thức search giảng viên theo toàn bộ thông tin cá nhân, tìm kiếm gần đúng
+        -input: 1 hoặc nhiều thông tin cá nhân
+        -return: 1 list dictionary chứa các thông tin giảng viên thỏa điều kiện
+        """
         cursor=AdminUser.db_conn.cursor()
         query = "SELECT * FROM lecturer WHERE 1=1"
         conditions = []
@@ -138,6 +178,11 @@ class Admin:
             st_list.append(re.__dict__)
         return st_list
     def search_course(self,courseid='',coursename='',facultyid=''):
+        """
+        phương thức search môn học theo courseID, course name, facultyID, tìm kiếm gần đúng
+        -input: 1 hoặc nhiều thông tin 
+        -return: 1 list dictionary chứa các thông tin môn học thỏa điều kiện
+        """
         cursor=Admin.db_conn.cursor()
         query="select * from course where 1=1"
         conditions=[]
@@ -158,6 +203,11 @@ class Admin:
             c_list.append(course)
         return c_list
     def add_course(self,courseid='',coursename='',facultyid='',credit='',description='',previous='',following=''):
+        """
+        phương thức thêm môn học mới
+        -input: các thông tin môn học
+        -return: true nếu thêm thành công, false nếu thất bại
+        """
         cursor=Admin.db_conn.cursor()
         query="insert into course (courseid,coursename,facultyid,credit,description,previouscourse,followingcourse) values (%s,%s,%s,%s,%s,%s,%s)"
         cursor.execute(query,(courseid,coursename,facultyid,credit,description,previous,following,))
@@ -166,6 +216,11 @@ class Admin:
             return True
         return False
     def delete_course(self,courseid):
+        """
+        phương thức xóa môn học 
+        -input: courseID
+        -return: true nếu xóa thành công, false nếu thất bại
+        """
         cursor=Admin.db_conn.cursor()
         query="delete from course where courseid=%s"
         cursor.execute(query,(courseid,))
@@ -174,6 +229,11 @@ class Admin:
             return True
         return False
     def backup_to_file(self):
+        """
+        phương thức lấy file back up database
+        -input: none
+        -return: none
+        """
         cursor = Admin.db_conn.cursor()
         cursor.execute("SHOW TABLES")
         tables = cursor.fetchall()
@@ -200,6 +260,11 @@ class Admin:
                     f.write(insert_query + ";\n")
             cursor.close()
     def send_file_mail(self, email):
+        """
+        phương thức gửi file back up qua mail
+        -input: admin mail
+        -return: none
+        """
         msg = Message('Back up file', sender=mail_user, recipients=[email,])
         msg.body = 'File back up database'
         
@@ -211,15 +276,30 @@ class Admin:
 
 @app.route('/admin_home')
 def admin_home():
+    """
+    hàm hướng đến admin_home
+    -input: none
+    -return: page admin_home.html 
+    """
     return render_template('admin_home.html')
 
 @app.route('/student_record_manage')
 def student_record_manage():
+    """
+    hàm hướng đến student_record_manage
+    -input: none
+    -return: page student_record_manage.html 
+    """
     return render_template('student_record_manage.html',l_class_fa=Admin().get_faculty_class(),st_id=Admin().get_max_studentid(),l_class=AdminUser().get_list_class_student(),l_faculty=AdminUser().get_list_faculty())
 
 @app.route('/search_student_record',methods=['POST'])
 def search_student_record():
-   if request.method == 'POST':
+    """
+    hàm search student theo toàn bộ thông tin cá nhân, tìm kiếm gần đúng
+    -input: 1 hoặc nhiều thông tin cá nhân
+    -return: page student_record_manage và danh sách sinh viên thỏa điều kiện
+    """
+    if request.method == 'POST':
         student_id = request.form['studentId']
         student_name = request.form['studentName']
         date_of_birth = request.form['dateOfBirth']
@@ -235,6 +315,11 @@ def search_student_record():
 
 @app.route('/input_student',methods=['POST'])
 def input_student(): #cần insert student, account, send_mail
+    """
+    hàm thêm sinh viên mới
+    -input: thông tin cá nhân sinh viên
+    -return: message thông báo thêm thành công hay thất bại
+    """
     studentid=request.form['studentid']
     name=request.form['name']
     dob=request.form['dob']
@@ -255,6 +340,11 @@ def input_student(): #cần insert student, account, send_mail
 
 @app.route('/delete_student',methods=['POST'])
 def delete_student():
+    """
+    hàm xóa sinh viên 
+    -input: studentID
+    -return: message thông báo xóa thành công hay thất bại
+    """
     studentid=request.form['studentid']
     try:
         Admin().delete_student(studentid)
@@ -265,11 +355,21 @@ def delete_student():
 
 @app.route('/lecturer_record_manage')
 def lecturer_record_manage():
+    """
+    hàm hướng đến lecturer_record_manage
+    -input: none
+    -return: page lecturer_record_manage.html 
+    """
     return render_template('lecturer_record_manage.html',lt_id=Admin().get_max_lecturerid(),l_faculty=AdminUser().get_list_faculty())
 
 @app.route('/search_lecturer_record',methods=['POST'])
 def search_lecturer_record():
-   if request.method == 'POST':
+    """
+    hàm search lecturer theo toàn bộ thông tin cá nhân, tìm kiếm gần đúng
+    -input: 1 hoặc nhiều thông tin cá nhân
+    -return: page lecturer_record_manage và danh sách giảng viên thỏa điều kiện
+    """
+    if request.method == 'POST':
         lecturer_id = request.form['lecturerid']
         lecturer_name = request.form['lecturerName']
         date_of_birth = request.form['dateOfBirth']
@@ -284,6 +384,11 @@ def search_lecturer_record():
 
 @app.route('/input_lecturer',methods=['POST'])
 def input_lecturer():
+    """
+    hàm thêm giảng viên mới
+    -input: thông tin cá nhân giảng viên
+    -return: message thông báo thêm thành công hay thất bại
+    """
     lecturerid=request.form['lecturerid']
     name=request.form['name']
     dob=request.form['dob']
@@ -303,6 +408,11 @@ def input_lecturer():
 
 @app.route('/delete_lecturer',methods=['POST'])
 def delete_lecturer():
+    """
+    hàm xóa giảng viên 
+    -input: lecturerID
+    -return: message thông báo xóa thành công hay thất bại
+    """
     lecturerid=request.form['lecturerid']
     try:
         Admin().delete_lecturer(lecturerid)
@@ -313,10 +423,20 @@ def delete_lecturer():
 
 @app.route('/course_manage')
 def course_manage():
+    """
+    hàm hướng đến course_manage
+    -input: none
+    -return: page course_manage.html 
+    """
     return render_template('course_manage.html',l_faculty=AdminUser().get_list_faculty(),l_course_full=Course().get_course())
 
 @app.route('/search_course',methods=['POST'])
 def search_course():
+    """
+    hàm search course theo toàn bộ thông tin, tìm kiếm gần đúng
+    -input: 1 hoặc nhiều thông tin 
+    -return: page course_manage và danh sách  course thỏa điều kiện
+    """
     courseid=request.form['course_id']
     coursename=request.form['course_name']
     facultyid=request.form['faculty_id']
@@ -324,6 +444,11 @@ def search_course():
 
 @app.route('/add_course',methods=['POST'])
 def add_course():
+    """
+    hàm thêm môn học mới
+    -input: thông tin môn học
+    -return: page course_manage và message báo thành công hay thất bại
+    """
     courseid=request.form['course_id']
     coursename=request.form['course_name']
     facultyid=request.form['faculty_id']
@@ -340,6 +465,11 @@ def add_course():
 
 @app.route('/delete_course',methods=['POST'])
 def delete_course():
+    """
+    hàm delete môn học
+    -input: courseID
+    -return: page course_manage và message báo xóa thành công hay thất bại
+    """
     courseid=request.form['courseid']
     try:
         Admin().delete_course(courseid)
@@ -350,10 +480,20 @@ def delete_course():
 
 @app.route('/back_up')
 def back_up():
+    """
+    hàm hướng tới page back up
+    -input: note
+    -return: page back_up
+    """
     return render_template('back_up.html')
 
 @app.route('/backup_login',methods=['POST'])
 def backup_login():
+    """
+    hàm backup
+    -input: username, password
+    -return: page course_manage và message báo thông tin đăng nhập đúng hay sai hay đã back up thành công
+    """
     username=request.form['username']
     password=request.form['password']
     if  username=="adminadmin" and Login(username,password).login()==True:

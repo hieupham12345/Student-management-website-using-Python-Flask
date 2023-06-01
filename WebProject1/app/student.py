@@ -1,6 +1,9 @@
 from login import *
 from ad_user import draw_pie_chart,setstyle_table
 class Student:
+    """
+    class sinh viên chứa các phương thức cho sinh viên
+    """
     db_conn=None
     def __init__(self, studentID='', name='', dateOfBirth='', gender='', address='', email='', phoneNumber='', classID=''):
         self.studentID = studentID
@@ -14,6 +17,11 @@ class Student:
         if Student.db_conn is None:
             Student.db_conn=DatabaseConnector('st').connect()
     def update_info(self, email=None, phoneNumber=None, studentID=None,address=None):# update for student
+        """
+        phương thức cập nhập thông tin cá nhân:
+        -Input: thông tin cần cập nhập (email, phone number, address, studentid)
+        -Return: None
+        """
         cursor = Student.db_conn.cursor()
         if email:
             cursor.execute("UPDATE Student SET email=%s WHERE studentID=%s", (email, studentID))
@@ -26,6 +34,11 @@ class Student:
             self.address=address
         Student.db_conn.commit()
     def get_info(self,studentid):
+        """
+        phương thức lấy thông tin cá nhân giảng viên
+        -Input: studentID
+        -Return: 1 dictionary chứa thông tin giảng viên
+        """
         cursor = Student.db_conn.cursor()
         if studentid:
             query = "SELECT * FROM STUDENT WHERE STUDENTID= %s"
@@ -35,6 +48,11 @@ class Student:
                 student_info = Student(result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7])
                 return student_info
     def register_course(self,studentid): #return list of register_course
+        """
+        phương thức lấy danh sách môn học sinh viên đã đăng kí học phần
+        -Input: studentID
+        -Return: 1 list dictionary chứa thông tin môn học
+        """
         cursor=Student.db_conn.cursor()
         query="select course.courseid,coursename,credit from course_register inner join course on course_register.courseid=course.courseid where studentid=%s"
         cursor.execute(query,(studentid,))
@@ -45,16 +63,31 @@ class Student:
             list_register_courseid.append(cs)
         return list_register_courseid
     def save_course(self,studentid,courseid): #insert course to list register_course
+        """
+        phương thức đăng kí môn học (add vào list đăng kí)
+        -Input: studentID, courseID
+        -Return: True nếu add thành công vào database, false nếu thất bại
+        """
         cursor=Student.db_conn.cursor()
         query = "INSERT INTO course_register (studentID, courseID) values(%s,%s)"
         cursor.execute(query,(studentid,courseid))
         Student.db_conn.commit()
     def del_course(self,studentid,courseid): #delete course in list register_course
+        """
+        phương thức xóa đăng kí môn học (del from list đăng kí)
+        -Input: studentID, courseID
+        -Return: True nếu delete thành công từ database, false nếu thất bại
+        """
         cursor=Student.db_conn.cursor()
         query = "delete from course_register where studentid=%s and courseid=%s"
         cursor.execute(query,(studentid,courseid))
         Student.db_conn.commit()
     def st_attendance(self,studentid,scheduleid,time,note):
+        """
+        phương thức sinh viên điểm danh
+        -Input: studentID, scheduleID, time, note
+        -Return: true nếu insert database thành công, false nếu thất bại
+        """
         cursor=Student.db_conn.cursor()
         query="insert into attendance_add (studentid,scheduleid,time,note) values (%s,%s,%s,%s)"
         cursor.execute(query,(studentid,scheduleid,time,note))
@@ -66,6 +99,11 @@ class Student:
 #profile
 @app.route('/profile')
 def profile():
+    """
+    hàm lấy thông tin profile user
+    -Input: none
+    -Return: page profile.html với thông tin user tương ứng
+    """
     s=Student().get_info(session['username'])
     profile = s.__dict__
     return render_template('profile.html',profile=profile)
@@ -73,16 +111,31 @@ def profile():
 #dashboard
 @app.route('/dashboard')
 def dashboard():
+    """
+    hàm hướng tới dashboard
+    -input: none
+    -Return: page home.html
+    """
     return render_template('home.html')
 
 #schedule
 @app.route('/schedule')
 def schedule():
+    """
+    hàm hướng tới page thời khóa biểu
+    Input: none
+    return: page schedule.html với thông tin thời khóa biểu tương ứng
+    """
     return render_template('schedule.html',schedule=Schedule().get_schedule(session['username']))
 
 #courseRegister
 @app.route('/courseregister')
 def courseregister():
+    """
+    hàm hướng tới page đăng kí học phần
+    -input: none
+    -return: page course.html với thông tin danh sách môn học và danh sách đăng kí
+    """
     username=session['username']
     l_re_courseid=Student().register_course(username)         
     course=Course().get_course()
@@ -93,6 +146,11 @@ def courseregister():
 #grades
 @app.route('/grades')
 def grades():
+    """
+    hàm hướng tới page điểm số
+    -Input: none
+    -return: page grade.html với thông tin điểm số của user
+    """
     grades = Grade().get_grade(session['username'])
     total_grade = 0
     sum_credit=0
@@ -109,6 +167,11 @@ def grades():
 #tuitionfee
 @app.route('/tuitionfee')
 def tuitionfee():
+    """
+    hàm hướng tới page học phí
+    -Input: none
+    -return: page grade.html với thông tin học phí của user
+    """
     tuition=Tuitionfee().get_tuitionfee(session['username'])
     if tuition is not None:
         tuition=tuition.__dict__
@@ -117,12 +180,22 @@ def tuitionfee():
 #testschedule
 @app.route('/testschedule')
 def testschedule():
+    """
+    hàm hướng tới page lịch thi
+    -Input: none
+    -return: page grade.html với thông tin lịch thi của user
+    """
     test=TestSchedule().get_testschedule(session['username'])
     return render_template('testschedule.html',test=test)
 
 #/save_course
 @app.route('/save_course', methods=['POST'])
 def save_course():
+    """
+    hàm save course, add course vào danh sách đăng kí học phần
+    -Input: 1 list chứa các courseID
+    -return: message thông báo thành công hay thất bại
+    """
     course=Course().get_course()
     for c in course:
         c=c.__dict__
@@ -143,6 +216,11 @@ def save_course():
 #xoa_course
 @app.route('/del_course', methods=['POST'])
 def del_course():
+    """
+    hàm delete course, delete course từ danh sách đăng kí học phần
+    -Input: 1 list chứa các courseID
+    -return: message thông báo thành công hay thất bại
+    """
     course=Course().get_course()
     for c in course:
         c=c.__dict__
@@ -160,6 +238,11 @@ def del_course():
 #update_info
 @app.route('/update_info', methods=['POST'])
 def update_info():
+    """
+    hàm cập nhập thông tin
+    -input: mail, phone, address
+    -return: message thông báo thành công hay thất bại
+    """
     mail = request.form['mail']
     phone = request.form['phone']
     address=request.form['address']
@@ -172,6 +255,11 @@ def update_info():
 
 @app.route('/st_attendance',methods=['POST'])
 def st_attendance():
+    """
+    hàm tham gia điểm danh
+    -input: username, time, note, scheduleid
+    -return: message báo đã điểm danh thành công hay chưa
+    """
     studentid=session['username']
     time=request.form['time']
     note=request.form['note']
@@ -184,6 +272,11 @@ def st_attendance():
     return render_template('schedule.html',schedule=Schedule().get_schedule(session['username']),Message=mess)
 
 def draw_bar_char_st(df):
+    """
+    hàm vẽ biểu đồ cột
+    -input: dataframe chứa thông tin điểm số (cần có avg, và group by theo số lượng)
+    -return: file pdf chứa biểu đồ
+    """
     with pdf.PdfPages('bar_chart.pdf') as pdf_file:
         bins=[0,1,2,3,4,4.999,6,7,8,9,10]
         df['avg_bin']=pd.cut(df['avg'],bins=bins, include_lowest=True)
@@ -202,6 +295,11 @@ def draw_bar_char_st(df):
 
 @app.route('/st_download_report')
 def st_download_report():
+    """
+    hàm download báo cáo file pdf
+    -input: none
+    -return: file báo cáo pdf tương ứng lựa chọn user
+    """
     pdfmetrics.registerFont(TTFont('Tahoma', 'tahoma.ttf'))
     columns=('courseID', 'semester', 'lecturerID', 'process','mid','final','avg','credit')
     grades = Grade().get_grade(session['username'])
