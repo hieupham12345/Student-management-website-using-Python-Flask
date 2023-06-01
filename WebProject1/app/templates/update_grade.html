@@ -134,49 +134,7 @@
                </tbody>
             </table>
          </div>
-      </div>
-      <div style="display: block; float: right; width: 50%;">
-         {% for semester, classes in list_class_previous|groupby(attribute='Semester') %}
-         <table>
-            <div style="display: block;  right:20px">
-               <h2>{{semester}}</h2>
-               <thead>
-                  <tr>
-                     <th>Course ID</th>
-                     <th>Course Name</th>
-                     <th>Semester</th>
-                     <th>Excel</th>
-                     <th>Report pdf</th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {% for class in classes %}
-                  <tr>
-                     <td>{{ class['Course ID'] }}</td>
-                     <td>{{ class['Course Name'] }}</td>
-                     <td>{{ class['Semester'] }}</td>
-                     <td>
-                        <form action="{{ url_for('down_report_grade') }}" method="post">
-                           <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
-                           <input type="hidden" name="semester" value="{{ class['Semester'] }}">
-                           <button type="submit" name="download_button">Excel</button>
-                        </form>
-                     </td>
-                     <td>
-                        <form action="{{ url_for('down_report_grade_pdf') }}" method="post">
-                           <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
-                           <input type="hidden" name="semester" value="{{ class['Semester'] }}">
-                           <button type="submit" name="download_button">Report pdf</button>
-                        </form>
-                     </td>
-                  </tr>
-                  {% endfor %}
-               </tbody>
-         </table>
-         </div>
-         {% endfor %}
-      </div>
-      <div style="display: block;">
+      <div style="display: block;float: left; width: 50%;">
          {% if list_student %}
          <form method="POST" action="/input_grade">
             <table>
@@ -230,5 +188,48 @@
          </form>
          {% endif %}
       </div>
+      </div>
+      <div style="display: block; float: right; width: 50%;">
+         {% for semester, classes in list_class_previous|groupby(attribute='Semester') %}
+         <table>
+            <div style="display: block;  right:20px">
+               <h2>{{semester}}</h2>
+               <thead>
+                  <tr>
+                     <th>Course ID</th>
+                     <th>Course Name</th>
+                     <th>Semester</th>
+                     <th>Excel</th>
+                     <th>Report pdf</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for class in classes %}
+                  <tr>
+                     <td>{{ class['Course ID'] }}</td>
+                     <td>{{ class['Course Name'] }}</td>
+                     <td>{{ class['Semester'] }}</td>
+                     <td>
+                        <form action="{{ url_for('down_report_grade') }}" method="post">
+                           <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
+                           <input type="hidden" name="semester" value="{{ class['Semester'] }}">
+                           <button type="submit" name="download_button">Excel</button>
+                        </form>
+                     </td>
+                     <td>
+                        <form action="{{ url_for('down_report_grade_pdf') }}" method="post">
+                           <input type="hidden" name="courseid" value="{{ class['Course ID'] }}">
+                           <input type="hidden" name="semester" value="{{ class['Semester'] }}">
+                           <button type="submit" name="download_button">Report pdf</button>
+                        </form>
+                     </td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+         </table>
+         {% endfor %}
+         </div>
+      </div>
+
    </body>
 </html>
