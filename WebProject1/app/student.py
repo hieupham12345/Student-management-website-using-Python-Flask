@@ -72,7 +72,7 @@ class Student:
         query = "INSERT INTO course_register (studentID, courseID) values(%s,%s)"
         cursor.execute(query,(studentid,courseid))
         Student.db_conn.commit()
-    def del_course(self,studentid,courseid): #delete course in list register_course
+    def del_course(self,studentid,courseid): 
         """
         phương thức xóa đăng kí môn học (del from list đăng kí)
         -Input: studentID, courseID
