@@ -13,7 +13,7 @@ class Admin:
     def get_max_studentid(self): #for input
         """
         phương thức lấy studentID lớn nhất hiện tại (để tự động cập nhập studentID khi thêm sinh viên mới)
-        -input: note
+        -input: none
         -return: max studentID
         """
         cursor = Admin.db_conn.cursor()
@@ -27,8 +27,8 @@ class Admin:
         return new_id
     def get_max_lecturerid(self): #for input
         """
-        phương thức lấy lecturerID lớn nhất hiện tại (để tự động cập nhập lecturerID khi thêm sinh viên mới)
-        -input: note
+        phương thức lấy lecturerID lớn nhất hiện tại (để tự động cập nhập lecturerID khi thêm giảng viên mới)
+        -input: none
         -return: max lecturerID
         """
         cursor = Admin.db_conn.cursor()
@@ -43,7 +43,7 @@ class Admin:
     def get_faculty_class(self):
         """
         phương thức lấy danh sách khoa và lớp học tương ứng theo cặp khoa - lớp học
-        -input: note
+        -input: none
         -return: 1 list dictionary chứa thông tinh tương ứng
         """
         cursor=Admin.db_conn.cursor()
