@@ -1,0 +1,1 @@
+web: gunicorn studentwebflask:app --log-file -
