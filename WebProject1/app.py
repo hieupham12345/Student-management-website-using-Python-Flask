@@ -6,4 +6,3 @@ from admin import *
 if __name__ == '__main__':
 	app.run()
 
-#abcheroku logs --tail
