@@ -15,6 +15,7 @@ Login information:
 + Role lecturer: lt000001 / password1
 + Role admin user: ad000001 / password1
 + Role admin: adminadmin / admin123
+  
 You can see more about the project in the report file in the Report folder.
 
 ## Environment Variables
