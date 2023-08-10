@@ -272,7 +272,7 @@ def login():
                     return render_template('login.html', error='Invalid username or password')
         except:
             # Error occurred while checking login credentials
-            return render_template('login.html', error='An error occurred while checking your login credentials')
+            return render_template('login.html', error='Invalid username or password')
     else:
         # GET request, return login form
         return render_template('login.html')
