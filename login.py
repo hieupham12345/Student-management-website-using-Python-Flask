@@ -32,6 +32,11 @@ from email.mime.base import MIMEBase
 
 mail_user=os.environ.get('outlook_mail_user')
 mail_pass=os.environ.get('outlook_mail_pass')
+host1=os.environ.get('host')
+username1 = os.environ.get('username') 
+password1 = os.environ.get('password')
+port1 = os.environ.get('port')
+database1 = os.environ.get('database')
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('flask_secret_key')
@@ -68,31 +73,35 @@ class DatabaseConnector:
         """
         if self.db_name == 'st':
             config = {
-                'user': 'student',
-                'password': 'password',
-                'host': 'localhost',
-                'database': 'studentmanagement'
+                'user': username1,
+                'password': password1,
+                'host': host1,
+                'database': database1,
+                'port':port1,
             }
         elif self.db_name == 'lt':
             config = {
-                'user': 'lecturer',
-                'password': 'password',
-                'host': 'localhost',
-                'database': 'studentmanagement'
+                'user': username1,
+                'password': password1,
+                'host': host1,
+                'database': database1,
+                'port':port1,
             }
         elif self.db_name=='ad':
             config = {
-                'user': 'admin',
-                'password': 'admin',
-                'host': 'localhost',
-                'database': 'studentmanagement'
+                 'user': username1,
+                'password': password1,
+                'host': host1,
+                'database': database1,
+                'port':port1,
             }
         elif self.db_name=='adminadmin':
             config={
-                'user': 'adminadmin',
-                'password': 'admin',
-                'host': 'localhost',
-                'database':'studentmanagement'}
+                'user': username1,
+                'password': password1,
+                'host': host1,
+                'database': database1,
+                'port':port1,}
         else:
             raise ValueError(f"Unsupported database name: {self.db_name}")
         
