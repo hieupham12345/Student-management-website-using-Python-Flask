@@ -7,6 +7,7 @@ This is a student management website written in Flask Python. This website provi
 This is my first project as a 2nd-year student at the University of Information Technology (UIT). I completed it within 2 months, dedicating 1 month to learning Python, HTML, and CSS. Therefore, this project may not be of very high quality. For the frontend, I only designed the user interface to a level that is sufficient for demonstrating the project.
 
 2. Result
+   
 I have successfully deployed the project to Heroku using the following link: https://studentwebflask-f61b4f17bcc3.herokuapp.com However, since I am using the free service of Heroku, I am unable to authorize the database.
 
 Login information:
@@ -19,7 +20,6 @@ You can see more about the project in the report file in the Report folder.
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file
-
 
 Use outlook mail for sending email by using Flask-mail 
 
@@ -44,9 +44,6 @@ Flask serect key
 **Backend:** Python
 
 **Framework:** Flask
-
-
-
 
 ## Authors
 
