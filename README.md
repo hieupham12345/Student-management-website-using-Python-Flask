@@ -27,7 +27,7 @@ Use outlook mail for sending email by using Flask-mail
 `mail_user`
 `mail_pass`
 
-For deploying to Heroku
+Connect to database when deploying:
 
 `host1`
 `username1` 
