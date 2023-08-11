@@ -27,7 +27,7 @@ Use outlook mail for sending email by using Flask-mail
 `mail_user`
 `mail_pass`
 
-Connect to the database on deployment:
+Connect to the database:
 
 `host1`
 `username1` 
