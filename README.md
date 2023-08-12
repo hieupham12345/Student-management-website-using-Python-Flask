@@ -3,7 +3,7 @@
 
 ## Project overview
 
-This is a student management website written in Flask Python. This website provides student management features such as registration, score tracking, class schedules, and student personal information. It also provides faculty and staff with management features such as classroom management, grades and class schedules, and student attendance. Besides, the website also supports students and lecturers to export score-related reports, helping to visualize score data to track the learning process more effectively.
+This is a student management website written in Flask Python. This website provides student management features such as courses registration, score tracking, class schedules, and student personal information. It also provides faculty and staff with management features such as classroom management, grades and class schedules, and student attendance. Besides, the website also supports students and lecturers to export score-related reports, helping to visualize score data to track the learning process more effectively.
 This is my first project as a 2nd-year student at the University of Information Technology (UIT). I completed it within 2 and haft months, of which 1 month to learning Python, HTML, and CSS. Therefore, this project may not be of very high quality. For the frontend, I only designed the user interface to a level that is sufficient for demonstrating the project.
 
 ## Result
