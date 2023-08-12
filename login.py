@@ -231,6 +231,7 @@ def login():
     """
     if request.method == 'POST':
         username = request.form['username']
+        username=username.lower()
         password = request.form['password']
         if len(password) < 8:
             return render_template('login.html', error='Password must be at least 8 characters')  
@@ -295,6 +296,7 @@ def reset_password():
     -Return: message báo thành công hay thất bại
     """
     username = request.form['username']
+    username=username.lower()
     email = request.form['email']
     a=Reset_password(username,email).change_pass()
     if a==True:
