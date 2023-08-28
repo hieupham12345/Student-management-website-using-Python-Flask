@@ -330,7 +330,16 @@ class AdminUser:
             st={'StudentID':r[3],'Name':r[0],'ClassID':r[1],'FacultyID':r[2],'CourseID':r[4],'Semester':r[5],'LecturerID':r[6],'process':r[7],'mid':r[8],'final':r[9],'avg':r[10]}
             st_list.append(st)
         return st_list
-
+    def get_lecturerid(self):
+        cursor=AdminUser.db_conn.cursor()
+        query="select lecturerid, name from lecturer"
+        cursor.execute(query)
+        result=cursor.fetchall()
+        l_lt=[]
+        for r in result:
+            re={'Lecturer ID':r[0],'Name':r[1]}
+            l_lt.append(re)
+        return l_lt    
 
 
 
@@ -378,7 +387,7 @@ def test_schedule_manage():
     -input: none
     -return: page test_schedule_manage.html
     """
-    return render_template('test_schedule_manage.html',test_list=AdminUser().get_test_schedule_list(),test_list_schedule=AdminUser().get_test_from_schedule(),l_room=AdminUser().get_room())
+    return render_template('test_schedule_manage.html',test_list=AdminUser().get_test_schedule_list(),test_list_schedule=AdminUser().get_test_from_schedule(),l_room=AdminUser().get_room(),l_lt=AdminUser().get_lecturerid())
 
 
 @app.route('/add_test_schedule',methods=['POST'])

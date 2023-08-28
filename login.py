@@ -32,12 +32,14 @@ from email.mime.base import MIMEBase
 
 mail_user=os.environ.get('outlook_mail_user')
 mail_pass=os.environ.get('outlook_mail_pass')
+
 host1=os.environ.get('host')
 username1 = os.environ.get('username') 
 password1 = os.environ.get('password')
 port1 = os.environ.get('port')
 database1 = os.environ.get('database')
 """
+
 host1='localhost'
 username1 = 'admin'
 password1 = 'admin'
