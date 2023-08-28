@@ -37,9 +37,18 @@ username1 = os.environ.get('username')
 password1 = os.environ.get('password')
 port1 = os.environ.get('port')
 database1 = os.environ.get('database')
+"""
+host1='localhost'
+username1 = 'admin'
+password1 = 'admin'
+port1 = '3306'
+database1 = 'studentmanagement'
+"""
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('flask_secret_key')
+
 
 
 @app.route('/')

@@ -378,7 +378,7 @@ def test_schedule_manage():
     -input: none
     -return: page test_schedule_manage.html
     """
-    return render_template('test_schedule_manage.html',test_list=AdminUser().get_test_schedule_list(),test_list_schedule=AdminUser().get_test_from_schedule(),l_room=AdminUser().get_room(),l_lt=AdminUser().get_lecturerid())
+    return render_template('test_schedule_manage.html',test_list=AdminUser().get_test_schedule_list(),test_list_schedule=AdminUser().get_test_from_schedule(),l_room=AdminUser().get_room())
 
 
 @app.route('/add_test_schedule',methods=['POST'])
