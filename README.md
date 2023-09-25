@@ -8,7 +8,7 @@ This is my first project as a 2nd-year student at the University of Information 
 
 ## Result
    
-I have successfully deployed the project to Heroku using the following link: https://studentwebflask-f61b4f17bcc3.herokuapp.com However, since I am using the free service of Heroku, I am unable to authorize the database.
+I have successfully deployed the project to Heroku using the following link: https://studentwebflask-f61b4f17bcc3.herokuapp.com However. This application will take a while to start. Since I am using the free service of Heroku, I am unable to authorize the database in the source code.
 
 Login information:
 + Role student: st000001 / password
